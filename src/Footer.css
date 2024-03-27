@@ -1,0 +1,13 @@
+/* Footer.css */
+.footer {
+  position: relative;
+  width: 100%;
+  background-color: #4285f4;
+  color: white;
+  text-align: center;
+  padding: 10px 0;
+}
+.content-wrapper {
+  margin-bottom: 10px; /* Adjust the value according to your footer's height */
+}
+

@@ -1,0 +1,104 @@
+.templateContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.searchInput_Container {
+  position: fixed;
+  top: 80px; /* Adjust this value to match the height of your navbar */
+  width: 100%;
+  background-color: #fff;
+  padding: 10px;
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+  z-index: 1000; /* Ensure it's above other elements */
+}
+
+.searchInput {
+  display: flex;
+  align-items: center;
+  border: 2px solid orange; /* Add an orange border */
+  border-radius: 5px; /* Add border radius for rounded corners */
+}
+
+
+.searchIcon {
+  width: 20px;
+  height: 20px;
+  margin-right: 10px;
+}
+
+#searchInput {
+  width: 100%;
+  border: none;
+  outline: none;
+  font-size: 16px;
+}
+
+.searchbar-container {
+  position: fixed;
+  top: 80px; /* Adjust this value to match the height of your navbar */
+  width: 100%;
+  background-color: white; /* Optional: Add background color */
+  z-index: 1000; /* Ensure search bar is above other elements */
+  padding: 10px; /* Optional: Add padding for spacing */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Optional: Add box shadow for styling */
+}
+
+.templateContainer {
+  margin-top: 120px; /* Adjust this value to create space below the search bar */
+}
+
+
+.template_Container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.template {
+  width: 23%; /* Adjust this value based on your preference */
+  margin-bottom: 20px; /* Adjust as needed for spacing between rows */
+  text-align: center; /* Center the content within the template */
+}
+
+.image-container {
+  width: 100%;
+  height: 150px; /* Adjust the height as needed */
+  overflow: hidden; /* Hide any overflowing content */
+}
+
+.template-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain; /* Ensure the image fits without distortion */
+}
+
+.template h3 {
+  margin-top: 10px; /* Add some spacing between title and image */
+}
+
+.price {
+  font-weight: bold;
+}
+.plus-button {
+margin-top: 10px; /* Adjust the margin as needed */
+background-color: #4CAF50; /* Add your desired background color */
+color: #fff; /* Add your desired text color */
+padding: 5px 10px; /* Adjust the padding as needed */
+border: none;
+cursor: pointer;
+}
+.searchInput {
+  position: relative;
+}
+
+.searchIcon {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  right: 10px; /* Adjust the right position as needed */
+  width: 20px; /* Adjust the width of the search icon */
+  height: auto; /* Maintain aspect ratio */
+}
+

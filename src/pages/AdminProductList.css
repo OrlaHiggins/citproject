@@ -1,0 +1,47 @@
+.templateContainer {
+    margin: 20px; /* Add margin around the edge of the page */
+    padding: 20px; /* Add padding around the edge of the page */
+  }
+  
+  .template_Container {
+    padding: 40px;
+  }
+  
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  th, td {
+    padding: 10px;
+    text-align: center;
+    border-bottom: 1px solid #ccc;
+  }
+  
+  .product-image {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+  }
+  
+  .buttons {
+    display: flex;
+    justify-content: space-around;
+  }
+  
+  .delete-button {
+    width: 100px;
+    margin-top: 10px;
+    background-color: #ff0000;
+    color: #ffffff;
+  }
+  
+  .edit-button {
+    width: 100px;
+    margin-top: 10px;
+    background-color: green;
+    color: #ffffff;
+  }
+  
+  
+  

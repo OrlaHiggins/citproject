@@ -1,0 +1,119 @@
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.header {
+    width: 400px;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.text {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.underline {
+    height: 2px;
+    background-color: #333;
+    margin-bottom: 20px;
+}
+
+.inputs {
+    margin-bottom: 20px;
+}
+
+.input {
+    margin-bottom: 10px;
+}
+
+label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.form-control {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+}
+
+.error-message {
+    color: red;
+    margin-top: 10px;
+}
+
+.submit-container {
+    text-align: center;
+}
+
+.btn {
+    padding: 10px 20px;
+    background-color: #ff9333;
+    color: #fff;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.btn:hover {
+    background-color: #0056b3;
+}
+.admin-details {
+    position: fixed;
+    top: 75px; /* Adjust as needed */
+    left: 0; /* Adjust as needed */
+    width: 100%; /* Make the section occupy the full width */
+    background-color: #ff9333;
+    padding: 15px;
+    text-align: center;
+    color: #fff;
+}
+
+
+/* 
+.add-product-container {
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  
+  .add-product-container h1 {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  .add-product-container form label {
+    display: block;
+    margin-bottom: 5px;
+  }
+  
+  .add-product-container form input {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+  }
+  
+  .add-product-container form button {
+    width: 100%;
+    padding: 10px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .add-product-container form button:hover {
+    background-color: #0056b3;
+  } */

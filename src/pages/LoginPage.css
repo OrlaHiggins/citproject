@@ -1,0 +1,121 @@
+.container{
+    display: flex;
+    flex-direction: column;
+    /* align-items: center; */
+    margin: auto;
+    margin-top: 50px;
+    background: #fff;
+    padding-bottom: 30px;
+}
+.header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  margin-top: 30px; /* Change '30ox' to '30px' */
+}
+
+/* Add these styles to your existing CSS */
+
+.auth-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: auto;
+    margin-top: 50px;
+    background: #fff;
+    padding-bottom: 30px;
+  }
+  
+  .auth-inner {
+    width: 100%;
+    max-width: 480px; /* Adjust the max-width as needed */
+  }
+  
+  .form-control {
+    height: 40px;
+    width: 100%;
+    background: transparent;
+    border: 1px solid #ccc; /* Add border as needed */
+    border-radius: 6px;
+    padding: 8px; /* Adjust padding as needed */
+    margin-bottom: 20px; /* Adjust margin-bottom as needed */
+    color: #797979;
+    font-size: 16px;
+    outline: none;
+  }
+
+.inputs {
+    margin-top: 25px; /* Adjust the margin-top as needed */
+    display: flex;
+    flex-direction: column;
+    gap: 20px; /* Adjust the gap as needed */
+  }
+  
+  .input {
+    display: flex;
+    align-items: center;
+    margin: auto;
+    width: 480px;
+    height: 60px; /* Adjust the height as needed */
+    background: #eaeaea;
+    border-radius: 6px;
+  }
+  
+  .input img {
+    margin: 0px 20px; /* Adjust the margin as needed */
+  }
+  
+  .input input {
+    height: 40px; /* Adjust the height as needed */
+    width: 400px;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: #797979;
+    font-size: 16px; /* Adjust the font-size as needed */
+  }
+  
+  .forgot-password {
+    padding-left: 62px;
+    margin-top: 20px; /* Adjust the margin-top as needed */
+    color: #797979;
+    font-size: 16px; /* Adjust the font-size as needed */
+    text-align: center;
+  }
+  
+  .submit-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px; /* Adjust the gap as needed */
+    margin: 20px auto;
+  }
+  
+  .submit {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 220px;
+    height: 50px; /* Adjust the height as needed */
+    color: #fff;
+    background: #4CAF50;
+    border-radius: 50px;
+    font-size: 16px; /* Adjust the font-size as needed */
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .signup-link {
+    color: purple;
+    text-decoration: underline;
+    border: none;
+  }
+  .gray {
+    background: #eaeaea;
+    color: #676767;
+  }
+  .text-center {
+    text-align: center;
+  }
+  

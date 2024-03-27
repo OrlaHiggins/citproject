@@ -1,0 +1,7 @@
+/* background.css */
+.background-image {
+    background-image: url('/landscapeveg.jpeg'); /* Add the image URL */
+    background-size: cover;
+    background-position: center;
+  }
+  

@@ -1,0 +1,89 @@
+[
+    {
+        "id": 1,
+        "image": "/asdamilk.png",  
+        "title": "ASDA 1 litre semi-skimmed milk",
+        "price": 1.10,
+        "category": "Milk"
+    },
+    
+    {
+        "id": 2,
+        "image": "/marksandspencermilk.png",
+        "title": "M&S 1 litre semi-skimmed milk",
+        "price": 1.35,
+        "category": "Milk"
+    },
+    {
+        "id": 3,
+        "image": "/asdaeggs.png",
+        "title": "ASDA dozen eggs",
+        "price": 2.60,
+        "category": "Eggs"
+    },
+    {
+        "id": 4,
+        "image": "/m&seggs.png",
+        "title": "M&S dozen eggs",
+        "price": 2.60,
+        "category": "Eggs"
+    },
+    {
+        "id": 5,
+        "image": "/asdabread.png",
+        "title": "ASDA Soft White Medium Sliced Bread",
+        "price": 0.75,
+        "category": "Bread"
+    },
+    {
+        "id": 6,
+        "image": "/marksandspencersbread.png",
+        "title": "M&S Super Soft White Medium Sliced Bread",
+        "price": 0.75,
+        "category": "Bread"
+    },
+    {
+        "id": 7,
+        "image": "/asdaketchup.png",
+        "title": "ASDA Tomato Ketchup",
+        "price": 0.65,
+        "category": "Ketchup"
+    },
+    {
+        "id": 8,
+        "image": "/m&sketchup.png",
+        "title": "M&S Tomato Ketchup",
+        "price": 3.25,
+        "category": "Ketchup"
+    },
+    {
+        "id": 9,
+        "image": "/asdabutter.jpeg",
+        "title": "ASDA Soft Spread Butter",
+        "price": 0.95,
+        "category": "Butter"
+    },
+    {
+        "id": 10,
+        "image": "/msbutter.jpeg",
+        "title": "M&S Salted Butter",
+        "price": 4.75,
+        "description": "M&S Salted Butter is made from high-quality cream, giving it a rich and creamy taste. Perfect for spreading on toast or using in your favorite recipes.",
+        "brand": "Marks & Spencer",
+        "category": "Butter"
+    },
+    {
+        "id": 11,
+        "image": "/asdacheese.webp",
+        "title": "ASDA Grated Mozzerella",
+        "price": 2.55,
+        "category": "Cheese"
+    },
+    {
+        "id": 12,
+        "image": "/mscheese.jpeg",
+        "title": "M&S Grated Mozzerella",
+        "price": 2.75,
+        "category": "Cheese"
+    }
+]

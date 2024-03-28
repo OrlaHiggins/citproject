@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useParams } from 'react-router-dom';
 import './ProductDetails.css';
 
+
 const ProductDetails = () => {
   const { id } = useParams();
   const [product, setProduct] = useState(null);
@@ -67,7 +68,7 @@ const ProductDetails = () => {
         {isAdmin ? (
           <button className="update-product-btn">Update Product</button>
         ) : (
-          <button className="add-to-cart-btn">Add to Cart</button>
+          <button className="add-to-cart-btn">Add to list</button>
         )}
       </div>
     </div>

@@ -17,6 +17,9 @@ import ProductDetails from "./pages/ProductDetails";
 import ListDetails from './pages/ListDetails';
 import AdminProductList from './pages/AdminProductList';
 import EditProduct from './pages/EditProduct';
+import UserAccountPage from "./pages/UserAccountPage.js"; 
+import AdminUserList from "./pages/AdminUserList"; 
+import AdminDashboard from "./pages/AdminDashboard";
 
 const App = () => {
   return (
@@ -38,6 +41,9 @@ const App = () => {
               <Route path="/lists/:listId" element={<ListDetails />} />
               <Route path="/admin/products" element={<AdminProductList />} />
               <Route path="/edit-product/:productId" exact component={EditProduct} />
+              <Route path="/user-account" element={<UserAccountPage />} />
+              <Route path="/admin/users" element={<AdminUserList />} />
+              <Route path="/admin" element={<AdminDashboard />} />
             </Routes>
           </div>
           <Footer />

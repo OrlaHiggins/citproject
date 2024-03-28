@@ -5,6 +5,8 @@ import "./Navbar.css";
 export const Navbar = () => {
   const [isAdmin, setIsAdmin] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [showAccountDropdown, setShowAccountDropdown] = useState(false);
+  const [showAdminDropdown, setShowAdminDropdown] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -52,20 +54,21 @@ export const Navbar = () => {
     navigate("/login");
   };
 
-  const handleAccountLinkClick = (e) => {
-    e.preventDefault();
-    if (isAdmin) {
-      navigate("/add-product");
-    } else {
-      navigate("/account");
-    }
+  const handleDropdownItemClick = (path) => {
+    navigate(path);
   };
 
   return (
-    <nav className={`navbar ${location.pathname === '/' ? 'homepage-nav' : ''}`}>
-      <Link to="/" className="title">
-        Trolley Tracker
-      </Link>
+    <nav className={`navbar ${location.pathname === "/" ? "homepage-nav" : ""}`}>
+      {isAdmin ? (
+        <Link to="/admin" className="title">
+          Trolley Tracker
+        </Link>
+      ) : (
+        <Link to="/" className="title">
+          Trolley Tracker
+        </Link>
+      )}
       <ul>
         <li>
           {isLoggedIn ? (
@@ -76,18 +79,63 @@ export const Navbar = () => {
             <Link to="/login">Login</Link>
           )}
         </li>
-        <li>
-          <a href="#" onClick={handleAccountLinkClick}>
-            Account
-          </a>
-        </li>
-        <li>
-          {isAdmin ? (
-            <Link to="/admin/products">Edit Items</Link>
-          ) : (
-            <Link to="/product-list">Search</Link>
-          )}
-        </li>
+        {isLoggedIn && !isAdmin && (
+          <li
+            className="dropdown"
+            onMouseEnter={() => setShowAccountDropdown(true)}
+            onMouseLeave={() => setShowAccountDropdown(false)}
+          >
+            <a href="#">Account</a>
+            {showAccountDropdown && (
+              <ul className="dropdown-menu">
+                <li>
+                  <a href="#" onClick={() => handleDropdownItemClick("/user-account")}>
+                    Account Details
+                  </a>
+                </li>
+                <li>
+                  <a href="#" onClick={() => handleDropdownItemClick("/account")}>
+                    Shopping List
+                  </a>
+                </li>
+              </ul>
+            )}
+          </li>
+        )}
+        {isAdmin && (
+          <li
+            className="dropdown"
+            onMouseEnter={() => setShowAdminDropdown(true)}
+            onMouseLeave={() => setShowAdminDropdown(false)}
+          >
+            <a href="#">Admin</a>
+            {showAdminDropdown && (
+              <ul className="dropdown-menu">
+                 <li>
+                  <a href="#" onClick={() => handleDropdownItemClick("/add-product")}>
+                    Add Product
+                  </a>
+                </li>
+                <li>
+                  <a href="#" onClick={() => handleDropdownItemClick("/admin/products")}>
+                    Edit Items
+                  </a>
+                </li>
+                <li>
+                  <a href="#" onClick={() => handleDropdownItemClick("/admin/users")}>
+                    Edit Users
+                  </a>
+                </li>
+               
+              </ul>
+            )}
+          </li>
+        )}
+        {!isAdmin && (
+          <li>
+            <Link to="/product-list">Products</Link>
+          </li>
+        )}
       </ul>
     </nav>
   );

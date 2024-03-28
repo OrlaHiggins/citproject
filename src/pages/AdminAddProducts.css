@@ -67,7 +67,7 @@ label {
     background-color: #0056b3;
 }
 .admin-details {
-    position: fixed;
+    position:absolute;
     top: 75px; /* Adjust as needed */
     left: 0; /* Adjust as needed */
     width: 100%; /* Make the section occupy the full width */

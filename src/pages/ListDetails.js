@@ -11,6 +11,7 @@ const ListDetails = () => {
   const [editedList, setEditedList] = useState(null);
   const [availableProducts, setAvailableProducts] = useState([]);
   const [showEditModal, setShowEditModal] = useState(false);
+  
 
   useEffect(() => {
     const fetchListDetails = async () => {
@@ -131,65 +132,69 @@ const ListDetails = () => {
           console.log(`Item ${index} product details:`, product); // Log the product details for each item
 
           return (
-            <div key={index} className="product-container">
-              <div className="product-image">
-                {product ? (
-                  <Link to={`/products/${item.productId}`}>
-                    <img
-                      src={`http://localhost:5432/${product.imageUrls[0]}`}
-                      alt={product.product}
-                      style={{ width: '100%', height: 'auto' }}
-                    />
-                  </Link>
-                ) : (
-                  <p>Product not found</p>
-                )}
-              </div>
-              <div className="product-text">
-                {product ? (
-                  <>
-                    <h3>{product.product}</h3>
-                    {/* <p>{product.description}</p> */}
-                    <p>Price: £{product.price}</p>
-                  </>
-                ) : item.productId === null ? (
-                  <p>{item.title}</p>
-                ) : (
-                  <p>Product not found</p>
-                )}
-              </div>
-              <button onClick={() => handleDeleteListItem(index)}>Delete Item</button>
+            <div className="product-container">
+            <div className="product-image">
+              {product ? (
+                <Link to={`/products/${item.productId}`}>
+                  <img
+                    src={`http://localhost:5432/${product.imageUrls[0]}`}
+                    alt={product.product}
+                    style={{ width: '100%', height: 'auto' }}
+                  />
+                </Link>
+              ) : (
+                <p>Product not found</p>
+              )}
+            </div>
+            <div className="product-text">
+              {product ? (
+                <>
+                  <h3>{product.product}</h3>
+                  {/* <p>{product.description}</p> */}
+                  <p>Price: £{product.price}</p>
+                </>
+              ) : item.productId === null ? (
+                <p>{item.title}</p>
+              ) : (
+                <p>Product not found</p>
+              )}
+            </div>
+            <div className="product-actions">
+              {/* <button onClick={() => handleDeleteListItem(index)}>Delete Item</button> */}
               <button onClick={() => setShowEditModal(true)}>Edit</button>
             </div>
+          </div>
           );
         })}
       </div>
       {showEditModal && (
-        <div className="edit-modal">
-          <h2>Edit List</h2>
-          <ul>
-            {editedList.items.map((item, index) => (
-              <li key={index}>
-                {item.title}
-                <button onClick={() => handleDeleteListItem(index)}>X</button>
-              </li>
+  <div className="edit-modal">
+    <div className="edit-modal-content">
+      <h2>Edit List</h2>
+      <ul>
+        {editedList.items.map((item, index) => (
+          <li key={index}>
+            {item.title}
+            <button onClick={() => handleDeleteListItem(index)}>X</button>
+          </li>
+        ))}
+      </ul>
+      <div className="add-item-container">
+        <select onChange={(e) => handleAddItem(e.target.value)}>
+          <option value="">Select a product to add</option>
+          {availableProducts
+            .filter(product => !editedList.items.some(item => item.productId === product._id))
+            .map(product => (
+              <option key={product._id} value={product._id}>
+                {product.product}
+              </option>
             ))}
-          </ul>
-          <div className="add-item-container">
-            <select onChange={(e) => handleAddItem(e.target.value)}>
-              <option value="">Select a product to add</option>
-              {availableProducts
-                .filter(product => !editedList.items.some(item => item.productId === product._id))
-                .map(product => (
-                  <option key={product._id} value={product._id}>
-                    {product.product}
-                  </option>
-                ))}
-            </select>
-          </div>
-          <button onClick={() => setShowEditModal(false)}>Done</button>
-        </div>
-      )}
+        </select>
+      </div>
+      <button onClick={() => setShowEditModal(false)}>Done</button>
+    </div>
+  </div>
+)}
     </div>
   );
 };

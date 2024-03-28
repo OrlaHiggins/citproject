@@ -36,7 +36,7 @@ export default class Login extends Component {
         window.localStorage.setItem("token", data.data);
         // Check if userType is defined and is 'admin' (case-insensitive)
         if (data.userType && data.userType.toLowerCase() === 'admin') {
-          window.location.href = "./add-product";
+          window.location.href = "./admin";
         } else {
           window.location.href = "./account";
         }

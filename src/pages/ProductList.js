@@ -26,35 +26,36 @@ function ProductList() {
 
   return (
     <div className="productListContainer">
-      <div className="searchInput_Container">
-        <input
-          type="text"
-          placeholder="Search products..."
-          value={searchTerm}
-          onChange={e => setSearchTerm(e.target.value)}
-          id="searchInput"
-        />
-      </div>
-      {error && <p>{error}</p>}
-      <div className="productListGrid">
-        {filteredProducts.map(product => (
-          <div key={product._id} className="productCard">
-            <Link to={`/products/${product._id}`}>
-              <div className="productImageContainer">
-                <img
-                  src={`http://localhost:5432/${product.imageUrls[0]}`}
-                  alt={product.product}
-                  className="productImage"
-                />
-              </div>
-            </Link>
-            <div className="productText">
-              <h3>{product.product}</h3>
-            </div>
-          </div>
-        ))}
-      </div>
+    <div className="searchInputContainer">
+      <input
+        type="text"
+        placeholder="Search products..."
+        value={searchTerm}
+        onChange={e => setSearchTerm(e.target.value)}
+        id="searchInput"
+      />
     </div>
+    {error && <p>{error}</p>}
+    <div className="productListGrid">
+      {filteredProducts.map(product => (
+        <div key={product._id} className="productCard">
+          <Link to={`/products/${product._id}`}>
+            <div className="productImageContainer">
+              <img
+                src={`http://localhost:5432/${product.imageUrls[0]}`}
+                alt={product.product}
+                className="productImage"
+              />
+            </div>
+          </Link>
+          <div className="productText">
+            <h3>{product.product}</h3>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+  
   );
 }
 

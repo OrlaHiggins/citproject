@@ -1,17 +1,20 @@
 const mongoose = require('mongoose');
 
-const listSchema = new mongoose.Schema({
-  name: { type: String, required: true },
-  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'UserInfo' },
+const ListSchema = new mongoose.Schema({
+  name: String,
+  userId: mongoose.Schema.Types.ObjectId,
   items: [
     {
-      productId: { type: mongoose.Schema.Types.ObjectId, ref: 'ProductInfo' },
+      productId: mongoose.Schema.Types.ObjectId,
       title: String,
+      price: Number,
     },
   ],
+  totalPrice: Number,
 });
 
-const List = mongoose.model('List', listSchema);
+const List = mongoose.model('List', ListSchema); // Fixed typo here
 
 module.exports = List;
+
 

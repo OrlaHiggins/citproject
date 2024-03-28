@@ -21,15 +21,18 @@ function useAuth() {
 
 function Account() {
     const [userData, setUserData] = useState(null);
-    const [newListName, setNewListName] = useState(""); // New state for storing the name of the new list
-    const [newItemTitle, setNewItemTitle] = useState(""); // New state for storing the title of a new item
-    const [userLists, setUserLists] = useState([]); // New state for storing user's lists
+    const [newListName, setNewListName] = useState("");
+    const [newItemTitle, setNewItemTitle] = useState("");
+    const [userLists, setUserLists] = useState([]);
     const navigate = useNavigate();
-    const [showPopup, setShowPopup] = useState(false); // New state for controlling the popup visibility
+    const [showPopup, setShowPopup] = useState(false);
     const authenticated = useAuth();
     const [selectedItems, setSelectedItems] = useState([]);
     const [products, setProducts] = useState([]);
     const [selectedProducts, setSelectedProducts] = useState([]);
+    const [categories, setCategories] = useState([]);
+    const [selectedCategories, setSelectedCategories] = useState([]);
+    
 
     useEffect(() => {
         // Fetch user data and lists when component mounts
@@ -37,6 +40,7 @@ function Account() {
             fetchUserData();
             fetchUserLists();
             fetchProducts();
+            fetchCategories();
         }
     }, [authenticated]);
 
@@ -113,42 +117,47 @@ function Account() {
             });
     };
 
+    const fetchCategories = () => {
+        fetch('http://localhost:5432/categories')
+          .then((res) => res.json())
+          .then((data) => {
+            console.log('Categories data:', data); // Log the response data
+            setCategories(data);
+          })
+          .catch((error) => {
+            console.error("Error fetching categories:", error);
+          });
+      };
+      
     const handleProductSelect = (event) => {
         const selectedOptions = Array.from(event.target.selectedOptions, option => option.value);
         setSelectedProducts(selectedOptions);
       };
     
+      // Update the handleConfirm function
       const handleConfirm = async () => {
         setShowPopup(false);
-        if (newListName && selectedProducts.length > 0) {
+        if (newListName && selectedCategories.length > 0) {
           try {
             const token = window.localStorage.getItem("token");
-      
-            // Fetch the selected product objects from the database
-            const selectedProductObjects = await Promise.all(
-              selectedProducts.map(async (productId) => {
-                const response = await axios.get(`http://localhost:5432/products/${productId}`);
-                return response.data;
-              })
-            );
       
             const response = await axios.post('http://localhost:5432/createList', {
               token,
               listName: newListName,
-              products: selectedProductObjects,
+              categories: selectedCategories,
             });
       
             console.log('List created:', response.data);
       
-            // Fetch user lists after creating a new list
             fetchUserLists();
       
-            // Clear the selected products and list name after creating the list
-            setSelectedProducts([]);
+            setSelectedCategories([]);
             setNewListName("");
           } catch (error) {
             console.error('Error creating list:', error);
           }
+        } else {
+          console.error('List name or selected categories missing');
         }
       };
       const handleCreateList = async (token, items) => {
@@ -203,7 +212,22 @@ function Account() {
         acc[product.category].push(product);
         return acc;
     }, {});
-
+// Add a new function to handle deleting a list
+const handleDeleteList = async (listId) => {
+    try {
+      console.log('Deleting list with ID:', listId); // Log the listId
+  
+      const token = window.localStorage.getItem("token");
+      await axios.delete(`http://localhost:5432/lists/${listId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      fetchUserLists();
+    } catch (error) {
+      console.error('Error deleting list:', error);
+    }
+  };
 
     return (
         <div>
@@ -237,18 +261,21 @@ function Account() {
 
       {/* Display user's existing lists here */}
       {userLists.length > 0 && userLists.map((list, index) => (
-        <div className="list-box" key={index}>
-          <Link to={`/lists/${list._id}`}>
-            <h4>{list.name}</h4>
-          </Link>
-          {/* Add functionality to edit and delete items */}
-          <ul>
-            {list.items && list.items.map((item, itemIndex) => (
-              <li key={itemIndex}>{item.title}</li>
-            ))}
-          </ul>
-        </div>
+  <div className="list-box" key={index}>
+    <Link to={`/lists/${list._id}`}>
+      <h4>{list.name}</h4>
+    </Link>
+    <ul>
+      {list.items && list.items.length > 0 && list.items.map((item, itemIndex) => (
+        <li key={itemIndex}>{item.title}</li>
       ))}
+    </ul>
+    {list.totalPrice !== undefined && (
+      <p>Total Price: £{list.totalPrice.toFixed(2)}</p>
+    )}
+    <button onClick={() => handleDeleteList(list._id)}>Delete</button>
+  </div>
+))}
     </div>
   </section>
 )}
@@ -263,32 +290,27 @@ function Account() {
         onChange={(e) => setNewListName(e.target.value)}
         placeholder="Enter list name"
       />
-      <h3>Select Products</h3>
-      {Object.entries(productsByCategory).map(([category, products]) => (
-        <div key={category}>
-          {/* <h4>{category}</h4> */}
-          {products.map((product) => (
-            <div key={product._id}>
-              <label>
-                <input
-                  type="checkbox"
-                  value={product._id}
-                  checked={selectedProducts.includes(product._id)}
-                  onChange={(e) => {
-                    const productId = e.target.value;
-                    if (e.target.checked) {
-                      setSelectedProducts([...selectedProducts, productId]);
-                    } else {
-                      setSelectedProducts(selectedProducts.filter((id) => id !== productId));
-                    }
-                  }}
-                />
-                {product.product}
-              </label>
-            </div>
-          ))}
-        </div>
-      ))}
+<h3>Select Categories</h3>
+{categories.map((category) => (
+  <div key={category}>
+    <label>
+      <input
+        type="checkbox"
+        value={category}
+        checked={selectedCategories.includes(category)}
+        onChange={(e) => {
+          const categoryName = e.target.value;
+          if (e.target.checked) {
+            setSelectedCategories([...selectedCategories, categoryName]);
+          } else {
+            setSelectedCategories(selectedCategories.filter((c) => c !== categoryName));
+          }
+        }}
+      />
+      {category}
+    </label>
+  </div>
+))}
       <button onClick={handleConfirm}>Confirm</button>
       <button onClick={handleCancel}>Cancel</button>
     </div>

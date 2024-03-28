@@ -9,6 +9,7 @@
   min-height: calc(100vh - 30px); /* Adjust the value according to your footer's height */
   display: flex;
   flex-direction: column;
+  padding-top: 10px;
 }
 /* .App {
   text-align: center;

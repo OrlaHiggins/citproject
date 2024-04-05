@@ -3,6 +3,7 @@ const app = express();
 const mongoose = require('mongoose');
 const cors = require('cors');
 const bcrypt = require('bcryptjs');
+const ProductInfo = require('./ProductDetailsSchema');
 
 // CORS configuration
 app.use(cors({
@@ -34,6 +35,20 @@ const List = require('./ListSchema');
 const JWT_SECRET = "jnj3njnjnri4j5r8tj5gh85g9vfrt0j5489f5903f";
 const mongoURL = 'mongodb+srv://OrlaHiggins:TrolleyTracker@trolleytracker.1uqccf9.mongodb.net/?retryWrites=true&w=majority';
 
+// Middleware function to extract the JWT token from the Authorization header
+const extractToken = (req, res, next) => {
+  const authHeader = req.headers.authorization;
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    req.token = authHeader.slice(7); // Extract the token from the Authorization header
+  } else {
+    req.token = null; // If the Authorization header is not present or doesn't start with 'Bearer ', set token to null
+  }
+  next(); // Call the next middleware or route handler
+};
+
+// Use the extractToken middleware before the routes that require authentication
+app.use(extractToken);
+
 mongoose
   .connect(mongoURL, {
     useNewUrlParser: true,
@@ -44,11 +59,8 @@ mongoose
   .catch((e) => console.log(e));
 
 // Add the import statement for the schema
-const ProductDetailsSchema = require('./ProductDetailsSchema');
-
-// Register the schema
-const Product = mongoose.models.ProductInfo || mongoose.model('ProductInfo', ProductDetailsSchema);
-
+// const ProductInfo = mongoose.model('ProductInfo', ProductDetailsSchema);
+const { UserDetails } = require('./userDetails');
 require('./userDetails');
 
 const User = mongoose.model('UserInfo');
@@ -122,14 +134,20 @@ app.post('/userData', async (req, res) => {
 });
 
 // Update User Route
+// Update User Route
 app.put('/updateUser', async (req, res) => {
   try {
     const { fname, lname, email } = req.body;
+    const token = req.headers.authorization.split(' ')[1]; // Get the token from the Authorization header
 
-    // Find the user by email and update the details
-    const updatedUser = await User.findOneAndUpdate(
-      { email },
-      { fname, lname },
+    // Verify user token and retrieve user's ID
+    const decoded = jwt.verify(token, JWT_SECRET);
+    const userId = decoded.userId || decoded._id;
+
+    // Find the user by ID and update the details
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { fname, lname, email },
       { new: true }
     );
 
@@ -206,6 +224,42 @@ app.delete('/users/:userId', async (req, res) => {
     res.status(500).json({ error: 'Failed to delete user. Please try again later.' });
   }
 });
+app.put('/admin/users/:userId', async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const { fname, lname, email, userType } = req.body;
+    const token = req.headers.authorization.split(' ')[1]; // Get the token from the Authorization header
+
+    // Verify user token and retrieve admin user's ID
+    const decoded = jwt.verify(token, JWT_SECRET);
+    const adminUserId = decoded.userId || decoded._id;
+
+    // Check if the user is an admin
+    const adminUser = await User.findById(adminUserId);
+    if (!adminUser || adminUser.userType.toLowerCase() !== 'admin') {
+      return res.status(403).json({ error: 'Access denied. Admin privileges required.' });
+    }
+
+    // Find the user by ID and update the details
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { fname, lname, email, userType },
+      { new: true }
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    res.status(200).json({ message: 'User information updated successfully', user: updatedUser });
+  } catch (error) {
+    console.error('Error updating user information:', error);
+    res.status(500).json({ error: 'Failed to update user information' });
+  }
+});
+
+// Serve uploaded images and profile pictures
+app.use('/public/uploads', express.static(uploadsDir));
 
 app.post('/uploadProfilePicture', upload.single('profilePicture'), async (req, res) => {
   try {
@@ -215,13 +269,32 @@ app.post('/uploadProfilePicture', upload.single('profilePicture'), async (req, r
 
     const profilePicture = req.file.filename;
 
-    res.status(200).json({ status: 'ok', profilePicture });
+    // Get the user ID from the JWT token
+    const token = req.headers.authorization.split(' ')[1];
+    if (!token) {
+      return res.status(401).json({ error: 'Authentication token missing' });
+    }
+
+    const decoded = jwt.verify(token, JWT_SECRET);
+    const userId = decoded.userId || decoded._id;
+
+    // Update the user's profilePicture field in the database
+    const updatedUser = await UserDetails.findByIdAndUpdate(
+      userId,
+      { profilePicture },
+      { new: true }
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    res.status(200).json({ status: 'ok', profilePicture: updatedUser.profilePicture });
   } catch (error) {
     console.error('Error uploading profile picture:', error);
     res.status(500).json({ error: 'Failed to upload profile picture' });
   }
 });
-
 const isAdmin = (req, res, next) => {
   // Assuming user information is stored in req.user after authentication
   if (req.user && req.user.userType === 'Admin') {
@@ -233,25 +306,28 @@ const isAdmin = (req, res, next) => {
   }
 };
 
-// Serve uploaded images
 app.use('/public/uploads', express.static(uploadsDir));
 
 // Register route for product upload
 app.post('/createProduct', upload.array('productImages', 5), async (req, res) => {
   try {
-    const { product, description, category, price } = req.body;
-    const imageUrls = req.files.map(file => `public/uploads/${file.filename}`); // Correctly construct image URLs
+    const { product, description, category, price, websiteLink, storeId } = req.body;
+    const imageUrls = req.files.map((file) => `public/uploads/${file.filename}`);
 
-    const newProduct = await Product.create({
+    const newProduct = await ProductInfo.create({
       product,
       description,
       category,
       price,
-      imageUrls
+      imageUrls,
+      websiteLink,
+      storeId,
+      updatedAt: Date.now(),
     });
+
     res.status(201).json(newProduct);
   } catch (error) {
-    console.error("Error creating product:", error);
+    console.error('Error creating product:', error);
     res.status(500).json({ error: 'Failed to create product.' });
   }
 });
@@ -259,7 +335,7 @@ app.post('/createProduct', upload.array('productImages', 5), async (req, res) =>
 // Fetch products endpoint
 app.get('/products', async (req, res) => {
   try {
-    const products = await Product.find({});
+    const products = await ProductInfo.find({});
     res.json(products);
   } catch (error) {
     console.error("Error fetching products:", error);
@@ -271,23 +347,13 @@ app.get('/products', async (req, res) => {
 app.get('/products/:id', async (req, res) => {
   try {
     const productId = req.params.id;
-    const product = await Product.findById(productId);
+    const product = await ProductInfo.findById(productId);
     res.json(product);
   } catch (error) {
     console.error("Error fetching product:", error);
     res.status(500).json({ error: 'Failed to fetch product. Please try again later.' });
   }
 });
-
-// app.get('/categories', async (req, res) => {
-//   try {
-//     const categories = await ProductInfo.distinct('category');
-//     res.json(categories);
-//   } catch (error) {
-//     console.error("Error fetching categories:", error);
-//     res.status(500).json({ error: 'Failed to fetch categories. Please try again later.' });
-//   }
-// });
 
 // Delete product by ID endpoint
 app.delete('/products/:id', async (req, res) => {
@@ -311,14 +377,12 @@ app.delete('/products/:id', async (req, res) => {
       return res.status(403).json({ error: 'Access denied. Admin privileges required.' });
     }
 
-    const product = await Product.findById(productId);
-    console.log('Retrieved product:', product); // Log the retrieved product
+    const product = await ProductInfo.findByIdAndDelete(productId);
+    console.log('Deleted product:', product); // Log the deleted product
 
     if (!product) {
       return res.status(404).json({ error: 'Product not found' });
     }
-    // Once authorized, proceed with deleting the product
-    await Product.findByIdAndDelete(productId);
 
     // Send a success response
     res.json({ message: 'Product deleted successfully' });
@@ -329,19 +393,24 @@ app.delete('/products/:id', async (req, res) => {
 });
 
 // Update product by ID endpoint
-app.put('/products/:id', async (req, res) => {
+app.put('/products/:id', upload.array('productImages', 5), async (req, res) => {
   try {
     const productId = req.params.id;
-    const { product, description, category } = req.body;
+    const { product, description, category, price, websiteLink, storeId } = req.body;
+    const imageUrls = req.files.map((file) => `public/uploads/${file.filename}`);
 
-    // Verify if the productId is a valid ObjectId
-    if (!mongoose.isValidObjectId(productId)) {
-      return res.status(400).json({ error: 'Invalid product ID' });
-    }
-
-    const updatedProduct = await Product.findByIdAndUpdate(
+    const updatedProduct = await ProductInfo.findByIdAndUpdate(
       productId,
-      { product, description, category },
+      {
+        product,
+        description,
+        category,
+        price,
+        websiteLink,
+        storeId,
+        imageUrls,
+        updatedAt: Date.now(),
+      },
       { new: true }
     );
 
@@ -355,10 +424,11 @@ app.put('/products/:id', async (req, res) => {
     res.status(500).json({ error: 'Failed to update product. Please try again later.' });
   }
 });
+
 // Add a new endpoint to fetch categories
 app.get('/categories', async (req, res) => {
   try {
-    const categories = await Product.distinct('category');
+    const categories = await ProductInfo.distinct('category');
     res.json(categories);
   } catch (error) {
     console.error("Error fetching categories:", error);
@@ -366,18 +436,15 @@ app.get('/categories', async (req, res) => {
   }
 });
 
-// Update the createList endpoint
 app.post('/createList', async (req, res) => {
   try {
-    const { token, listName, categories } = req.body;
+    const { token, listName, categories, productId } = req.body;
 
     console.log('Received token:', token);
     console.log('Received listName:', listName);
     console.log('Received categories:', categories);
 
     const decoded = jwt.verify(token, JWT_SECRET);
-    console.log('Decoded user from token:', decoded);
-
     const userId = decoded.userId || decoded._id;
 
     if (!userId) {
@@ -387,17 +454,23 @@ app.post('/createList', async (req, res) => {
 
     const selectedProducts = await Promise.all(
       categories.map(async (category) => {
-        const product = await Product.findOne({ category }).sort({ price: 1 }).limit(1);
+        const product = await ProductInfo.findOne({ category }).sort({ price: 1 }).limit(1);
         return product;
       })
     );
+    if (productId) {
+      const product = await ProductInfo.findById(productId);
+      if (product) {
+        selectedProducts.push(product);
+      }
+    }
 
     console.log('Selected products:', selectedProducts);
 
     const totalPrice = selectedProducts.reduce((total, product) => {
       return total + (product ? product.price : 0);
     }, 0);
-    
+
     const newList = await mongoose.model('List').create({
       name: listName,
       userId: new mongoose.Types.ObjectId(userId),
@@ -409,9 +482,13 @@ app.post('/createList', async (req, res) => {
       totalPrice: totalPrice,
     });
 
-    console.log('New list created:', newList);
+    // Fetch the user's updated lists after creating the new list
+    const userLists = await mongoose.model('List').find({ userId: new mongoose.Types.ObjectId(userId) });
 
-    res.json({ status: 'ok', message: 'List created successfully', newList });
+    console.log('New list created:', newList);
+    console.log('Updated user lists:', userLists);
+
+    res.json({ status: 'ok', message: 'List created successfully', newList, userLists });
   } catch (error) {
     console.error('Error creating list:', error);
     res.status(500).json({ status: 'error', error: 'Failed to create list' });
@@ -420,7 +497,12 @@ app.post('/createList', async (req, res) => {
 
 app.get('/userLists', async (req, res) => {
   try {
-    const token = req.query.token; // Get the token from the query parameters
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ error: 'Authorization header is missing or invalid' });
+    }
+
+    const token = authHeader.split(' ')[1];
 
     console.log('Received token:', token); // Log the received token
 
@@ -436,9 +518,10 @@ app.get('/userLists', async (req, res) => {
     res.json({ status: 'ok', lists: userLists });
 
     console.log('Retrieved user lists:', userLists); // Log the retrieved user lists
-
-    // res.json({ status: 'ok', lists: userLists });
   } catch (error) {
+    if (error.name === 'JsonWebTokenError') {
+      return res.status(401).json({ error: 'Invalid token' });
+    }
     console.error('Error fetching user lists:', error);
     res.status(500).json({ status: 'error', error: 'Failed to fetch user lists' });
   }
@@ -470,7 +553,7 @@ app.get('/lists/:listId', async (req, res) => {
       ...list.toObject(),
       items: await Promise.all(
         list.items.map(async (item) => {
-          const product = await Product.findById(item.productId);
+          const product = await ProductInfo.findById(item.productId);
           return {
             ...item.toObject(),
             product: product ? product.toObject() : null,
@@ -479,40 +562,51 @@ app.get('/lists/:listId', async (req, res) => {
       ),
     };
 
-    res.json(listWithProductDetails);
+    // Calculate the cheapest overall price
+    const totalPriceByStore = {};
+    listWithProductDetails.items.forEach((item) => {
+      if (item.product) {
+        const storeId = item.product.storeId; // Assuming you have a 'storeId' field in the ProductInfo model
+        if (!totalPriceByStore[storeId]) {
+          totalPriceByStore[storeId] = 0;
+        }
+        totalPriceByStore[storeId] += item.product.price;
+      }
+    });
+    const cheapestStoreId = Object.keys(totalPriceByStore).reduce((a, b) => totalPriceByStore[a] < totalPriceByStore[b] ? a : b);
+    const cheapestTotalPrice = totalPriceByStore[cheapestStoreId];
+
+    res.json({
+      ...listWithProductDetails,
+      cheapestTotalPrice,
+      cheapestStoreId,
+    });
   } catch (error) {
     console.error('Error fetching list details:', error);
     res.status(500).json({ error: 'Failed to fetch list details' });
   }
 });
-
 // Update list by ID endpoint
 app.put('/lists/:listId', async (req, res) => {
   try {
     const listId = req.params.listId;
-    const token = req.headers.authorization.split(' ')[1]; // Get the token from the Authorization header
-    const updatedList = req.body; // Assuming you're sending the updated list data in the request body
+    const token = req.headers.authorization.split(' ')[1];
+    const updatedList = req.body;
 
-    // Verify user token and retrieve user's ID
     const decoded = jwt.verify(token, JWT_SECRET);
     const userId = decoded.userId || decoded._id;
 
-    // Find the list by listId first
-    const list = await mongoose.model('List').findById(listId);
+    const list = await mongoose.model('List').findOneAndUpdate(
+      { _id: listId, userId: userId },
+      { $set: updatedList },
+      { new: true }
+    );
 
     if (!list) {
       return res.status(404).json({ error: 'List not found' });
     }
 
-    // Then check if the list belongs to the user
-    if (list.userId.toString() !== new mongoose.Types.ObjectId(userId).toString()) {
-      return res.status(403).json({ error: 'Access denied. You do not have permission to update this list.' });
-    }
-
-    // Update the list with the provided data
-    const updatedDoc = await mongoose.model('List').findByIdAndUpdate(listId, updatedList, { new: true });
-
-    res.json({ message: 'List updated successfully', updatedList: updatedDoc });
+    res.json({ message: 'List updated successfully', updatedList: list });
   } catch (error) {
     console.error('Error updating list:', error);
     res.status(500).json({ error: 'Failed to update list. Please try again later.' });
@@ -551,6 +645,49 @@ app.delete('/lists/:listId', async (req, res) => {
     res.status(500).json({ error: 'Failed to delete list. Please try again later.' });
   }
 });
+app.post('/lists/:listId/add-product', async (req, res) => {
+  try {
+    const { listId } = req.params;
+    const { productId } = req.body;
+    const token = req.headers.authorization.split(' ')[1];
+
+    const decoded = jwt.verify(token, JWT_SECRET);
+    const userId = decoded.userId || decoded._id;
+
+    const list = await mongoose.model('List').findById(listId);
+
+    if (!list) {
+      return res.status(404).json({ error: 'List not found' });
+    }
+
+    if (list.userId.toString() !== new mongoose.Types.ObjectId(userId).toString()) {
+      return res.status(403).json({ error: 'Access denied. You do not have permission to add products to this list.' });
+    }
+
+    const product = await ProductInfo.findById(productId);
+
+    if (!product) {
+      return res.status(404).json({ error: 'Product not found' });
+    }
+
+    list.items.push({
+      productId: product._id,
+      title: product.product,
+      price: product.price,
+    });
+
+    // Update the total price of the list
+    list.totalPrice += product.price;
+
+    await list.save();
+
+    res.json({ message: 'Product added to list successfully', list });
+  } catch (error) {
+    console.error('Error adding product to list:', error);
+    res.status(500).json({ error: 'Failed to add product to list. Please try again later.' });
+  }
+});
+
 const PORT = process.env.PORT || 5432;
 app.listen(PORT, () => {
   console.log(`Server started on port ${PORT}`);

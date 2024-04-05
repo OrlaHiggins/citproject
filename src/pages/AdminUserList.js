@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTrashAlt, faPenToSquare } from '@fortawesome/free-solid-svg-icons';
 import './AdminUserList.css';
 
 function AdminUserList() {
@@ -8,6 +10,13 @@ function AdminUserList() {
   const [searchTerm, setSearchTerm] = useState('');
   const [isAdmin, setIsAdmin] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [editUserId, setEditUserId] = useState(null);
+  const [editedUser, setEditedUser] = useState({
+    fname: '',
+    lname: '',
+    email: '',
+    userType: '',
+  });
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -93,6 +102,74 @@ function AdminUserList() {
     }
   };
 
+  const handleEditUser = (userId) => {
+    const userToEdit = users.find((user) => user._id === userId);
+    setEditUserId(userId);
+    setEditedUser({
+      fname: userToEdit.fname,
+      lname: userToEdit.lname,
+      email: userToEdit.email,
+      userType: userToEdit.userType,
+    });
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setEditedUser((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }));
+  };
+
+  const handleSaveUser = async () => {
+    try {
+      const token = window.localStorage.getItem('token');
+      if (!token) {
+        console.error('Token is missing. Redirecting to login page.');
+        // Redirect to the login page or display an error message
+        return;
+      }
+  
+      const response = await axios.put(
+        `http://localhost:5432/admin/users/${editUserId}`,
+        editedUser,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+  
+      // Update the users state with the updated user data
+      setUsers((prevUsers) =>
+        prevUsers.map((user) =>
+          user._id === editUserId ? response.data.user : user
+        )
+      );
+  
+      setEditUserId(null);
+      setEditedUser({
+        fname: '',
+        lname: '',
+        email: '',
+        userType: '',
+      });
+    } catch (err) {
+      console.error('Error updating user:', err);
+      // Handle error
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setEditUserId(null);
+    setEditedUser({
+      fname: '',
+      lname: '',
+      email: '',
+      userType: '',
+    });
+  };
+
   return (
     <div className="templateContainer">
       {isLoading ? (
@@ -115,7 +192,8 @@ function AdminUserList() {
                 <table>
                   <thead>
                     <tr>
-                      <th>Name</th>
+                      <th>First Name</th>
+                      <th>Last Name</th>
                       <th>Email</th>
                       <th>User Type</th>
                       <th>Actions</th>
@@ -128,18 +206,78 @@ function AdminUserList() {
                       )
                       .map((user) => (
                         <tr key={user._id}>
-                          <td>{user.fname}</td>
-                          <td>{user.email}</td>
-                          <td>{user.userType}</td>
                           <td>
-                            <div className="buttons">
-                              <button
-                                className="delete-button"
-                                onClick={() => handleDeleteUser(user._id)}
+                            {editUserId === user._id ? (
+                              <input
+                                type="text"
+                                name="fname"
+                                value={editedUser.fname}
+                                onChange={handleInputChange}
+                              />
+                            ) : (
+                              user.fname
+                            )}
+                          </td>
+                          <td>
+                            {editUserId === user._id ? (
+                              <input
+                                type="text"
+                                name="lname"
+                                value={editedUser.lname}
+                                onChange={handleInputChange}
+                              />
+                            ) : (
+                              user.lname
+                            )}
+                          </td>
+                          <td>
+                            {editUserId === user._id ? (
+                              <input
+                                type="email"
+                                name="email"
+                                value={editedUser.email}
+                                onChange={handleInputChange}
+                              />
+                            ) : (
+                              user.email
+                            )}
+                          </td>
+                          <td>
+                            {editUserId === user._id ? (
+                              <select
+                                name="userType"
+                                value={editedUser.userType}
+                                onChange={handleInputChange}
                               >
-                                Delete
-                              </button>
-                            </div>
+                                <option value="User">User</option>
+                                <option value="Admin">Admin</option>
+                              </select>
+                            ) : (
+                              user.userType
+                            )}
+                          </td>
+                          <td>
+                            {editUserId === user._id ? (
+                              <div className="buttons">
+                                <button onClick={handleSaveUser}>Save</button>
+                                <button onClick={handleCancelEdit}>Cancel</button>
+                              </div>
+                            ) : (
+                              <div className="buttons">
+                                <button
+                                  className="edit-button"
+                                  onClick={() => handleEditUser(user._id)}
+                                >
+                                  <FontAwesomeIcon icon={faPenToSquare} />
+                                </button>
+                                <button
+                                  className="delete-button"
+                                  onClick={() => handleDeleteUser(user._id)}
+                                >
+                                  <FontAwesomeIcon icon={faTrashAlt} />
+                                </button>
+                              </div>
+                            )}
                           </td>
                         </tr>
                       ))}

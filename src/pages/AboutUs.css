@@ -1,0 +1,102 @@
+/* General Styles */
+body {
+    font-size: 16px; /* Set a base font size for mobile */
+  }
+  
+  .about-us {
+    background-color: #ff9333;
+    padding: 20px;
+    text-align: center;
+    color: #fff;
+  }
+  
+  .white-section {
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Vertically center the content */
+    align-items: center; /* Horizontally center the content */
+    background-color: #4285f4;
+    height: 100vh; /* Use viewport height for full-screen layout */
+    background-image: url('/landscapeveg.jpeg');
+    background-size: cover;
+    background-position: center;
+    color: #4285f4;
+    position: relative; /* Added for positioning the bubbles */
+  }
+  
+  .centered-container {
+    max-width: 100%;
+    padding: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    align-items: center;
+    height: 100%;
+  }
+  
+  /* Text Bubble Styles */
+  .text-bubble {
+    display: inline-block;
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 50%;
+    padding: 45px;
+    margin: 20px;
+    text-align: center;
+    max-width: 400px;
+    box-shadow: 0 4px 6px #4285f4;
+    position: absolute; /* Added for absolute positioning */
+  }
+  
+  .text-bubble:nth-child(1) {
+    left: 10%; /* Positions the first bubble on the left */
+  }
+  
+  .text-bubble:nth-child(2) {
+    right: 10%; /* Positions the second bubble on the right */
+  }
+  
+  .text-bubble:nth-child(3) {
+    bottom: 30%; /* Positions the third bubble at the bottom */
+    left: 50%;
+    transform: translateX(-50%); /* Centering the third bubble horizontally */
+  }
+  
+  .text-bubble p {
+    margin: 0;
+  }
+  
+  /* Responsive Styles */
+  @media (min-width: 768px) {
+    body {
+      font-size: 18px; /* Increase font size for larger screens */
+    }
+  
+    .centered-container {
+      max-width: 600px; /* Set a maximum width for larger screens */
+      padding: 20px; /* Increase padding for larger screens */
+    }
+  
+    .white-section {
+      height: 100vh; /* Set a fixed height for larger screens */
+      padding: 40px; /* Increase padding for larger screens */
+    }
+  }
+  
+  @media (max-width: 767px) {
+    .white-section {
+      height: auto; /* Remove the fixed height on smaller screens */
+      padding: 20px; /* Adjust padding for smaller screens */
+    }
+  
+    .centered-container {
+      flex-direction: column;
+      align-items: center;
+    }
+  
+    .text-bubble {
+      position: static; /* Reset the position to static on smaller screens */
+      margin: 10px 0; /* Adjust the vertical margin for spacing on smaller screens */
+    }
+  }
+  
+  

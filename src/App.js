@@ -20,6 +20,8 @@ import EditProduct from './pages/EditProduct';
 import UserAccountPage from "./pages/UserAccountPage.js"; 
 import AdminUserList from "./pages/AdminUserList"; 
 import AdminDashboard from "./pages/AdminDashboard";
+import FAQs from './pages/FAQs';
+import AboutUs from './pages/AboutUs';
 
 const App = () => {
   return (
@@ -44,6 +46,8 @@ const App = () => {
               <Route path="/user-account" element={<UserAccountPage />} />
               <Route path="/admin/users" element={<AdminUserList />} />
               <Route path="/admin" element={<AdminDashboard />} />
+              <Route path="/faqs" element={<FAQs />} />
+              <Route path="/aboutus" element={<AboutUs />} />
             </Routes>
           </div>
           <Footer />

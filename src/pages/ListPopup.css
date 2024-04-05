@@ -1,0 +1,52 @@
+/* ListPopup.css */
+.popup-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .popup {
+    background-color: white;
+    padding: 20px;
+    border-radius: 5px;
+    max-width: 500px;
+    width: 100%;
+  }
+  
+  .list-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 20px;
+  }
+  
+  .list-box {
+    background-color: #f2f2f2;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .list-box h4 {
+    margin-top: 0;
+  }
+  
+  .list-box ul {
+    padding-left: 20px;
+  }
+  
+  .new-list-box {
+    margin-bottom: 20px;
+  }
+  
+  .new-list-box input {
+    width: 100%;
+    padding: 5px;
+    margin-bottom: 10px;
+  }

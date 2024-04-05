@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import './ProductDetails.css';
+import ListPopup from './ListPopup';
 
 
 const ProductDetails = () => {
@@ -9,6 +11,8 @@ const ProductDetails = () => {
   const [product, setProduct] = useState(null);
   const [error, setError] = useState(null);
   const [isAdmin, setIsAdmin] = useState(false); // State to track admin status
+  const [showListPopup, setShowListPopup] = useState(false);
+  
 
   useEffect(() => {
     axios
@@ -47,10 +51,18 @@ const ProductDetails = () => {
   if (!product) {
     return <p>Loading...</p>;
   }
+  const handleAddToList = () => {
+    setShowListPopup(true);
+  };
+  const handleCloseListPopup = () => {
+    setShowListPopup(false);
+  };
+
 
   return (
     <div className="product-details-container">
       <div className="product-details-image-container">
+      <h1>{product.product}</h1>
         {product.imageUrls.map((imageUrl, index) => (
           <img
             key={index}
@@ -61,16 +73,31 @@ const ProductDetails = () => {
         ))}
       </div>
       <div className="product-details-info">
-        <h1>{product.product}</h1>
-        <p>Description: {product.description}</p>
+       
+        <p>{product.description}</p>
         <p>Price: £{product.price}</p>
-        <p>Category: {product.category}</p>
-        {isAdmin ? (
-          <button className="update-product-btn">Update Product</button>
-        ) : (
-          <button className="add-to-cart-btn">Add to list</button>
+        {/* <p>Category: {product.category}</p> */}
+        {product.websiteLink && (
+          <div>
+            <h3>Where to buy:</h3>
+            <a href={product.websiteLink} target="_blank" rel="noopener noreferrer">
+              Visit Website
+            </a>
+          </div>
+        )}
+{isAdmin ? (
+  <Link to="/admin/products">
+    <button className="update-product-btn">Update Product</button>
+  </Link>
+) : (
+  <button className="add-to-cart-btn" onClick={handleAddToList}>
+  Add to list
+</button>
         )}
       </div>
+      {showListPopup && (
+        <ListPopup productId={product._id} onClose={handleCloseListPopup} />
+      )}
     </div>
   );
 };

@@ -1,47 +1,94 @@
 .templateContainer {
-    margin: 20px; /* Add margin around the edge of the page */
-    padding: 20px; /* Add padding around the edge of the page */
-  }
-  
+  margin: 20px;
+  padding: 20px;
+}
+
+.template_Container {
+  padding: 40px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  padding: 10px;
+  text-align: center;
+  border-bottom: 1px solid #ccc;
+}
+
+.product-image {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+}
+
+.buttons {
+  display: flex;
+  justify-content: space-around;
+}
+
+.delete-button,
+.edit-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  color: #333;
+  transition: color 0.3s;
+}
+
+.delete-button:hover,
+.edit-button:hover {
+  color: #ff0000;
+}
+
+@media screen and (max-width: 768px) {
   .template_Container {
-    padding: 40px;
+    padding: 20px;
   }
-  
+
   table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-  
-  th, td {
-    padding: 10px;
-    text-align: center;
-    border-bottom: 1px solid #ccc;
-  }
-  
-  .product-image {
-    width: 100px;
-    height: 100px;
-    object-fit: cover;
-  }
-  
-  .buttons {
     display: flex;
-    justify-content: space-around;
+    flex-wrap: wrap;
   }
-  
-  .delete-button {
-    width: 100px;
-    margin-top: 10px;
-    background-color: #ff0000;
-    color: #ffffff;
+
+  thead {
+    display: none;
   }
-  
+
+  tr {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+  }
+
+  td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    text-align: left;
+    border-bottom: none;
+  }
+
+  td:before {
+    content: attr(data-label);
+    font-weight: bold;
+    margin-right: 10px;
+  }
+
+  .product-image {
+    width: 80px;
+    height: 80px;
+  }
+
+  .delete-button,
   .edit-button {
-    width: 100px;
-    margin-top: 10px;
-    background-color: green;
-    color: #ffffff;
+    font-size: 14px;
   }
-  
-  
-  
+}

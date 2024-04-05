@@ -13,6 +13,8 @@ function AdminAddProducts() {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState("");
     const navigate = useNavigate();
+    const [websiteLink, setWebsiteLink] = useState('');
+    const [storeId, setStoreId] = useState(""); 
 
     useEffect(() => {
         const fetchUserData = async () => {
@@ -70,31 +72,29 @@ function AdminAddProducts() {
             return;
         }
 
-        try {
-            const formData = new FormData();
-            formData.append("product", product);
-            formData.append("description", description);
-            formData.append("category", category);
-            formData.append("price", price);
-            formData.append("productImages", image);
+        const formData = new FormData();
+  formData.append('product', product);
+  formData.append('description', description);
+  formData.append('category', category);
+  formData.append('price', price);
+  formData.append('websiteLink', websiteLink); // Include the websiteLink field
+  formData.append('productImages', image);
+  formData.append('storeId', storeId);
+  try {
+    const response = await axios.post('http://localhost:5432/createProduct', formData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'multipart/form-data',
+      },
+    });
 
-            const response = await axios.post(
-                "http://localhost:5432/createProduct",
-                formData,
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                        "Content-Type": "multipart/form-data",
-                    },
-                }
-            );
-
-            console.log(response.data);
-            // Reset form fields or perform any other actions after successful submission
-        } catch (err) {
-            console.error(err);
-        }
-    };
+    console.log(response.data);
+    // Reset form fields or perform any other actions after successful submission
+  } catch (err) {
+    console.error(err);
+  }
+};
+    
 
     return (
         <div className="container">
@@ -110,7 +110,7 @@ function AdminAddProducts() {
 <div className="underline"></div>
 <form onSubmit={handleSubmit}>
     <div className="inputs">
-        <h2>Add Product</h2>
+        {/* <h2>Add Product</h2> */}
         {error && <p className="error-message">{error}</p>}
         <div className="input">
             <label htmlFor="">Product:</label>
@@ -161,6 +161,26 @@ function AdminAddProducts() {
                                             onChange={(e) => setImage(e.target.files[0])}
                                         />
                                     </div>
+                                    <div className="input">
+        <label htmlFor="">Store ID:</label>
+        <input
+          type="text"
+          placeholder="Enter Store ID"
+          className="form-control"
+          value={storeId}
+          onChange={(e) => setStoreId(e.target.value)}
+        />
+      </div>
+                                    <div className="input">
+      <label htmlFor="">Website Link:</label>
+      <input
+        type="text"
+        placeholder="Enter Website Link"
+        className="form-control"
+        value={websiteLink}
+        onChange={(e) => setWebsiteLink(e.target.value)}
+      />
+    </div>
                                     <div className="submit-container">
                                         <button type="submit" className="btn btn-primary">
                                             Submit

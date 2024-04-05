@@ -3,6 +3,11 @@ import './Account.css';
 import { useNavigate } from "react-router-dom";
 import axios from 'axios';
 import { Link } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCircleXmark } from '@fortawesome/free-regular-svg-icons';
+import { faCirclePlus } from '@fortawesome/free-solid-svg-icons';
+import { faMinus } from '@fortawesome/free-solid-svg-icons';
+
 
 function useAuth() {
     const [authenticated, setAuthenticated] = useState(false);
@@ -70,18 +75,35 @@ function Account() {
         });
     };
 
-      const fetchUserLists = async () => {
-        try {
-          const token = window.localStorage.getItem("token"); // Get the token from localStorage
-      
-          const response = await axios.get(`http://localhost:5432/userLists?token=${token}`);
-          const { lists } = response.data;
-      
-          setUserLists(lists);
-        } catch (error) {
-          console.error('Error fetching user lists:', error);
-        }
-      };
+    const formatDate = (dateString) => {
+      const date = new Date(dateString);
+      const now = new Date();
+      const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+  
+      if (date >= oneWeekAgo) {
+        return "This Week";
+      } else {
+        const options = { year: "numeric", month: "short", day: "numeric" };
+        return date.toLocaleDateString("en-US", options);
+      }
+    };
+    const fetchUserLists = async () => {
+      try {
+        const token = window.localStorage.getItem("token");
+        const config = {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        };
+    
+        const response = await axios.get("http://localhost:5432/userLists", config);
+        const { lists } = response.data;
+    
+        setUserLists(lists);
+      } catch (error) {
+        console.error("Error fetching user lists:", error);
+      }
+    };
 
     // const handleLogout = () => {
     //     // Perform logout actions
@@ -117,18 +139,15 @@ function Account() {
             });
     };
 
-    const fetchCategories = () => {
-        fetch('http://localhost:5432/categories')
-          .then((res) => res.json())
-          .then((data) => {
-            console.log('Categories data:', data); // Log the response data
-            setCategories(data);
-          })
-          .catch((error) => {
-            console.error("Error fetching categories:", error);
-          });
-      };
-      
+    const fetchCategories = async () => {
+      try {
+        const response = await fetch('http://localhost:5432/categories');
+        const categories = await response.json();
+        setCategories(categories);
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+      }
+    };
     const handleProductSelect = (event) => {
         const selectedOptions = Array.from(event.target.selectedOptions, option => option.value);
         setSelectedProducts(selectedOptions);
@@ -140,17 +159,13 @@ function Account() {
         if (newListName && selectedCategories.length > 0) {
           try {
             const token = window.localStorage.getItem("token");
-      
             const response = await axios.post('http://localhost:5432/createList', {
               token,
               listName: newListName,
               categories: selectedCategories,
             });
-      
             console.log('List created:', response.data);
-      
             fetchUserLists();
-      
             setSelectedCategories([]);
             setNewListName("");
           } catch (error) {
@@ -251,29 +266,38 @@ const handleDeleteList = async (listId) => {
 
 {authenticated && (
   <section className="your-lists">
-    <h3>Your Lists</h3>
+    <h3>My Lists</h3>
     <div className="folders-grid">
       {/* Add your "Create New List" box here */}
       <div className="new-list-box" onClick={handleAddList}>
         <p>Create New List</p>
-        <img src="pluscircle.jpeg" alt="Plus Circle" />
+        <FontAwesomeIcon icon={faCirclePlus} className="plus-icon" />
       </div>
-
-      {/* Display user's existing lists here */}
       {userLists.length > 0 && userLists.map((list, index) => (
   <div className="list-box" key={index}>
-    <Link to={`/lists/${list._id}`}>
-      <h4>{list.name}</h4>
-    </Link>
+    <div className="list-header">
+      <h4 className="list-name">
+        <Link to={`/lists/${list._id}`} className="list-link">
+          {list.name}
+        </Link>
+      </h4>
+      <FontAwesomeIcon
+        icon={faCircleXmark}
+        className="delete-icon"
+        onClick={() => handleDeleteList(list._id)}
+      />
+    </div>
     <ul>
       {list.items && list.items.length > 0 && list.items.map((item, itemIndex) => (
-        <li key={itemIndex}>{item.title}</li>
+        <li key={itemIndex}>
+          <FontAwesomeIcon icon={faMinus} className="bullet-icon" />
+          {item.title}
+        </li>
       ))}
     </ul>
     {list.totalPrice !== undefined && (
       <p>Total Price: £{list.totalPrice.toFixed(2)}</p>
     )}
-    <button onClick={() => handleDeleteList(list._id)}>Delete</button>
   </div>
 ))}
     </div>
@@ -321,8 +345,6 @@ const handleDeleteList = async (listId) => {
 }
 
 export default Account;
-
-
 
 
 

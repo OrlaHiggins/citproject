@@ -52,7 +52,7 @@ const AdminDashboard = () => {
 
   return (
     <div className="admin-dashboard">
-      <h1>Admin Dashboard</h1>
+      <h1>Welcome Back Admin User</h1>
       <div className="admin-actions">
         <button onClick={handleDeleteUsers}>Manage Users</button>
         <button onClick={handleDeleteProducts}>Manage Products</button>

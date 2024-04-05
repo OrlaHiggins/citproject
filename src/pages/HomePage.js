@@ -1,53 +1,81 @@
-import React, { useState } from 'react';
-import './HomePage.css';
-// HomePage.js
-import './background.css';
+import React from 'react';
 import { Link } from 'react-router-dom';
+import './HomePage.css';
 
 
-const HomePage = ({ userName }) => {
-  console.log('Rendering HomePage component');
-
-  // State variables
-  const [pageTitle, setPageTitle] = useState(''); // Updated pageTitle
-  const [pageContent, setPageContent] = useState(
-    'This is a simple example of a home page with React.'
-  );
-
-  // Function to change content dynamically
-  const changeContent = () => {
-    setPageContent('Content changed dynamically!');
-  };
-
+const Homepage = () => {
   return (
-    <div>
-      <section className="about-us">
-        <h2>About Us</h2>
-      </section>
-      <section className="white-section">
-        <div className="centered-container">
-          <div className="content-wrapper">
-            <div className="text-bubble">
-              <p>
-                At Trolley Tracker, we are committed to making your shopping experience smoother and more convenient. Our mission is to provide a reliable platform that helps you keep track of your shopping carts, ensuring they are always where you need them.
-              </p>
-            </div>
-            <div className="text-bubble">
-              <p>
-                Founded with the idea of enhancing the efficiency of your grocery shopping, Trolley Tracker offers a user-friendly solution to the common problem of misplaced shopping carts. Whether you're at a supermarket, department store, or any retail location using shopping carts, our platform is designed to make your shopping trips hassle-free.
-              </p>
-            </div>
-            <div className="text-bubble">
-              <p>Explore Trolley Tracker and make your shopping experience more enjoyable. <Link to="/signup"> Sign up</Link> now! </p>
-            </div>
-          </div>
+<div className="homepage">
+      <section className="hero">
+        <div className="hero-content">
+          <h1>Transform Your Shopping Experience</h1>
+          <h2>Discover the Best Deals with Trolley Tracker</h2>
+          <p>Compare prices, build personalized shopping lists, and unlock savings on your favorite products.</p>
+          <Link to="/faqs" className="cta-button">Learn More (FAQs)</Link>
+          <Link to="/aboutus" className="cta-button">About Us</Link>
+        </div>
+        <div className="hero-image">
+          <img src={process.env.PUBLIC_URL + '/trolleyimage.jpg'} alt="Trolley" />
         </div>
       </section>
+
+
+<section className="featured-lists">
+  <h2>Featured Shopping Lists</h2>
+  <div className="list-container">
+    {/* Add featured shopping lists here */}
+    <div className="featured-list">
+      <h3>Weekly Grocery Essentials</h3>
+      <p>Save time and money with our curated grocery list for the week.</p>
+      {/* Add list details or links to explore the list */}
+    </div>
+    <div className="featured-list">
+      <h3>Healthy Recipes Ingredients</h3>
+      <p>Discover ingredients for healthy and delicious recipes.</p>
+      {/* Add list details or links to explore the list */}
+    </div>
+  </div>
+</section>
+
+<section className="how-it-works">
+  <h2>How Trolley Tracker Works</h2>
+  <div className="step-container">
+    {/* Add steps or illustrations of how the platform works */}
+    <div className="step">
+      <h3>Step 1: Compare Prices</h3>
+      <p>Search for products and compare prices across multiple stores.</p>
+    </div>
+    <div className="step">
+      <h3>Step 2: Create Shopping Lists</h3>
+      <p>Organize your purchases into lists for easier shopping.</p>
+    </div>
+    <div className="step">
+      <h3>Step 3: Find the Best Deals</h3>
+      <p>Discover the cheapest options for your favorite products.</p>
+    </div>
+  </div>
+</section>
+
+<section className="testimonials">
+  <h2>What Our Users Say</h2>
+  <div className="testimonial-container">
+    {/* Add user testimonials here */}
+    <div className="testimonial">
+      <blockquote>"Trolley Tracker helped me save money on groceries! Highly recommended."</blockquote>
+      <p>- Jane Doe</p>
+    </div>
+    <div className="testimonial">
+      <blockquote>"Amazing platform for budget-conscious shoppers."</blockquote>
+      <p>- John Smith</p>
+    </div>
+  </div>
+</section>
+
     </div>
   );
 };
 
-export default HomePage;
+export default Homepage;
         
       {/* <section className="white-section">
         <div>

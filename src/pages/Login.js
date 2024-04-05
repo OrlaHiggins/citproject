@@ -1,4 +1,6 @@
 import React, { Component } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import "./LoginPage.css";
 
 export default class Login extends Component {
@@ -7,6 +9,8 @@ export default class Login extends Component {
     this.state = {
       email: "",
       password: "",
+      error: "",
+      showPassword: false,
     };
     this.handleSubmit = this.handleSubmit.bind(this);
   }
@@ -22,36 +26,39 @@ export default class Login extends Component {
         Accept: "application/json",
         "Access-Control-Allow-Origin": "*",
       },
-      body: JSON.stringify({
-        email,
-        password,
-      }),
+      body: JSON.stringify({ email, password }),
     })
-    .then((res) => res.json())
-    .then((data) => {
-      console.log(data, "userRegister");
-      console.log("User Type:", data.userType);
-      if (data.status === "ok") {
-        alert("Login successful");
-        window.localStorage.setItem("token", data.data);
-        // Check if userType is defined and is 'admin' (case-insensitive)
-        if (data.userType && data.userType.toLowerCase() === 'admin') {
-          window.location.href = "./admin";
+      .then((res) => res.json())
+      .then((data) => {
+        console.log(data, "userRegister");
+        console.log("User Type:", data.userType);
+        if (data.status === "ok") {
+          window.localStorage.setItem("token", data.data);
+          // Check if userType is defined and is 'admin' (case-insensitive)
+          if (data.userType && data.userType.toLowerCase() === "admin") {
+            window.location.href = "./admin";
+          } else {
+            window.location.href = "./account";
+          }
         } else {
-          window.location.href = "./account";
+          this.setState({
+            error: "Incorrect username or password. Please try again.",
+          });
         }
-      } else {
-        alert("Login failed. Check your credentials.");
-      }
-    });
-    
+      });
   }
 
+  togglePasswordVisibility = () => {
+    this.setState((prevState) => ({ showPassword: !prevState.showPassword }));
+  };
+
   render() {
+    const { showPassword } = this.state;
+
     return (
       <div className="auth-wrapper">
         <div className="auth-inner">
-          <div className="text-center"> {/* Added text-center class */}
+          <div className="text-center">
             <div className="text">Login</div>
           </div>
           <form onSubmit={this.handleSubmit}>
@@ -68,12 +75,20 @@ export default class Login extends Component {
               <div className="input">
                 <img src="password.png" alt="" />
                 <input
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   className="form-control"
                   placeholder="Password"
                   onChange={(e) => this.setState({ password: e.target.value })}
                 />
+                <FontAwesomeIcon
+                  icon={showPassword ? faEyeSlash : faEye}
+                  className="password-toggle"
+                  onClick={this.togglePasswordVisibility}
+                />
               </div>
+              {this.state.error && (
+                <div className="error">{this.state.error}</div>
+              )}
               <div className="submit-container">
                 <button type="submit" className="submit">
                   Submit
@@ -89,7 +104,6 @@ export default class Login extends Component {
     );
   }
 }
-
 
 // import React, { Component } from "react";
 // import "./LoginPage.css";

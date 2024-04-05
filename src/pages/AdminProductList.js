@@ -2,6 +2,9 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 import './AdminProductList.css'; // Import the CSS file
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTrashAlt } from '@fortawesome/free-solid-svg-icons';
+import { faPenToSquare } from '@fortawesome/free-regular-svg-icons';
 
 function AdminProductList() {
   const [products, setProducts] = useState([]);
@@ -15,8 +18,10 @@ function AdminProductList() {
     category: '',
     price: '',
     description: '',
+    websiteLink: '', // Include the websiteLink field
+    imageUrls: [],
+    storeId: '',
   });
-
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -105,6 +110,9 @@ function AdminProductList() {
       category: productToEdit.category,
       price: productToEdit.price,
       description: productToEdit.description,
+      websiteLink: productToEdit.websiteLink, // Include the websiteLink field
+      imageUrls: productToEdit.imageUrls, // Set the imageUrls field correctly
+      storeId: productToEdit.storeId,
     });
   };
 
@@ -116,6 +124,13 @@ function AdminProductList() {
     }));
   };
 
+  const handleImageChange = (e) => {
+    setEditedProduct((prevState) => ({
+      ...prevState,
+      imageUrls: Array.from(e.target.files),
+    }));
+  };
+
   const handleSaveProduct = async () => {
     try {
       const token = window.localStorage.getItem('token');
@@ -124,32 +139,52 @@ function AdminProductList() {
         // Redirect to the login page or display an error message
         return;
       }
-
+  
+      const formData = new FormData();
+      formData.append('product', editedProduct.product);
+      formData.append('storeId', editedProduct.storeId);
+      formData.append('description', editedProduct.description);
+      formData.append('category', editedProduct.category);
+      formData.append('price', editedProduct.price);
+      formData.append('websiteLink', editedProduct.websiteLink);
+  
+      // Append the image files individually
+      editedProduct.imageUrls.forEach((image) => {
+        if (typeof image === 'object') {
+          formData.append('productImages', image);
+        }
+      });
+  
       const response = await axios.put(
         `http://localhost:5432/products/${editProductId}`,
-        editedProduct,
+        formData,
         {
           headers: {
             Authorization: `Bearer ${token}`,
+            'Content-Type': 'multipart/form-data',
           },
         }
       );
-
-      console.log(response.data);
-
-      // Update the product in the state
+  
+      // Fetch the updated product data from the server
+      const updatedProduct = response.data;
+  
+      // Update the products state with the updated product data
       setProducts((prevProducts) =>
         prevProducts.map((product) =>
-          product._id === editProductId ? { ...product, ...editedProduct } : product
+          product._id === editProductId ? updatedProduct : product
         )
       );
-
+  
       setEditProductId(null);
       setEditedProduct({
         product: '',
         category: '',
         price: '',
         description: '',
+        websiteLink: '',
+        imageUrls: [],
+        storeId: '',
       });
     } catch (err) {
       console.error('Error updating product:', err);
@@ -164,6 +199,9 @@ function AdminProductList() {
       category: '',
       price: '',
       description: '',
+      websiteLink: '', // Reset the websiteLink field
+      imageUrls: [], // Reset the imageUrls field
+      storeId: '',
     });
   };
 
@@ -190,26 +228,50 @@ function AdminProductList() {
                   <thead>
                     <tr>
                       <th>Photo</th>
+                      <th>Store</th>
                       <th>Item Name</th>
                       <th>Category</th>
                       <th>Price</th>
                       <th>Description</th>
+                      <th>Links</th>
                       <th>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
                     {products
                       .filter((product) =>
+                        typeof product.product === 'string' &&
                         product.product.toLowerCase().includes(searchTerm.toLowerCase())
                       )
                       .map((product) => (
                         <tr key={product._id}>
                           <td>
-                            <img
-                              src={`http://localhost:5432/${product.imageUrls[0]}`}
-                              alt={product.product}
-                              className="product-image"
-                            />
+                            {editProductId === product._id ? (
+                              <input
+                                type="file"
+                                name="productImages"
+                                multiple
+                                onChange={handleImageChange}
+                              />
+                            ) : (
+                              <img
+                                src={`http://localhost:5432/${product.imageUrls[0]}`}
+                                alt={product.product}
+                                className="product-image"
+                              />
+                            )}
+                          </td>
+                          <td>
+                            {editProductId === product._id ? (
+                              <input
+                                type="text"
+                                name="storeId"
+                                value={editedProduct.storeId}
+                                onChange={handleInputChange}
+                              />
+                            ) : (
+                              product.storeId
+                            )}
                           </td>
                           <td>
                             {editProductId === product._id ? (
@@ -260,6 +322,18 @@ function AdminProductList() {
                           </td>
                           <td>
                             {editProductId === product._id ? (
+                              <input
+                                type="text"
+                                name="websiteLink"
+                                value={editedProduct.websiteLink}
+                                onChange={handleInputChange}
+                              />
+                            ) : (
+                              <p>{product.websiteLink || 'N/A'}</p>
+                            )}
+                          </td>
+                          <td>
+                          {editProductId === product._id ? (
                               <div className="buttons">
                                 <button onClick={handleSaveProduct}>Save</button>
                                 <button onClick={handleCancelEdit}>Cancel</button>
@@ -270,17 +344,17 @@ function AdminProductList() {
                                   className="edit-button"
                                   onClick={() => handleEditProduct(product._id)}
                                 >
-                                  Update
+                                  <FontAwesomeIcon icon={faPenToSquare} />
                                 </button>
                                 <button
                                   className="delete-button"
                                   onClick={() => handleDeleteProduct(product._id)}
                                 >
-                                  Delete
+                                  <FontAwesomeIcon icon={faTrashAlt} />
                                 </button>
                               </div>
                             )}
-                          </td>
+                             </td>
                         </tr>
                       ))}
                   </tbody>
@@ -296,10 +370,9 @@ function AdminProductList() {
       )}
     </div>
   );
-  }
-  
-  export default AdminProductList;
-// import React, { useEffect, useState } from 'react';
+}
+
+export default AdminProductList;
 // import axios from 'axios';
 // import { Link } from 'react-router-dom';
 // import './AdminProductList.css'; // Import the CSS file

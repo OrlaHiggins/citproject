@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import "./UserAccountPage.css"; // Import the CSS file
+import axios from 'axios';
+import "./UserAccountPage.css";
 
 const UserAccountPage = () => {
   const [user, setUser] = useState({
@@ -10,23 +10,25 @@ const UserAccountPage = () => {
     profilePicture: "",
   });
   const [isEditing, setIsEditing] = useState(false);
-  const [selectedImage, setSelectedImage] = useState(null); // State to store selected image
-  const navigate = useNavigate();
+  const [showProfilePictureModal, setShowProfilePictureModal] = useState(false);
+  const [selectedProfilePicture, setSelectedProfilePicture] = useState(null);
+
+  // You can store the available profile pictures in an array
+  const availableProfilePictures = [
+    "/uploads/pandaavatar.png",
+    "/public/uploads/foxavatar.png",
+    "/public/uploads/catblue.png",
+    "/public/uploads/bear.png",
+  ];
 
   useEffect(() => {
     // Fetch user data from the server and update state
     const fetchUserData = async () => {
       try {
-        const response = await fetch("http://localhost:5432/userData", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ token: localStorage.getItem("token") }),
-        });
-        const data = await response.json();
-        if (data.status === "ok") {
-          const { fname, lname, email, profilePicture } = data.data;
+        const token = localStorage.getItem("token");
+        const response = await axios.post("http://localhost:5432/userData", { token });
+        if (response.data.status === "ok") {
+          const { fname, lname, email, profilePicture } = response.data.data;
           setUser({ fname, lname, email, profilePicture });
         } else {
           console.error("Failed to fetch user data");
@@ -44,86 +46,74 @@ const UserAccountPage = () => {
 
   const handleSaveClick = async () => {
     try {
-      const response = await fetch("http://localhost:5432/updateUser", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
+      const token = localStorage.getItem("token");
+      const response = await axios.put(
+        "http://localhost:5432/updateUser",
+        {
           fname: user.fname,
           lname: user.lname,
-          email: user.email,
-        }),
-      });
+          email: user.email || '', // Ensure email is not empty
+          profilePicture: selectedProfilePicture || user.profilePicture,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
   
-      if (response.ok) {
+      if (response.status === 200) {
         setIsEditing(false);
+        setUser({ ...user, profilePicture: selectedProfilePicture || user.profilePicture });
       } else {
         console.error("Failed to update user details");
       }
     } catch (error) {
       console.error("Error updating user details:", error);
     }
+  };
 
-    // Logic to upload profile picture
-    if (selectedImage) {
-        const formData = new FormData();
-        formData.append("profilePicture", selectedImage);
-    
-        try {
-          const response = await fetch("http://localhost:5432/uploadProfilePicture", {
-            method: "POST",
-            body: formData,
-          });
-    
-          if (response.ok) {
-            const data = await response.json();
-            setUser({ ...user, profilePicture: data.profilePicture });
-          } else {
-            console.error("Failed to upload profile picture");
-          }
-        } catch (error) {
-          console.error("Error uploading profile picture:", error);
-        }
-      }
-    };
-
-  const handleImageChange = (e) => {
-    setSelectedImage(e.target.files[0]);
+  const handleProfilePictureSelect = (pictureUrl) => {
+    setSelectedProfilePicture(pictureUrl);
+    setShowProfilePictureModal(false);
   };
 
   return (
     <div className="userAccountContainer">
       <h2>Account Details</h2>
       <div className="userProfile">
-      <input
-  type="file"
-  id="profilePictureInput"
-  accept="image/*"
-  onChange={handleImageChange}
-  style={{ display: "none" }}
-/>
-        <label htmlFor="profilePictureInput">
-          <div className="profilePictureWrapper">
-            <img
-              src={user.profilePicture || "/default-profile.jpg"}
-              alt="Profile"
-              className="profilePicture"
-            />
-            {!user.profilePicture && <div className="addPhotoText">Add Photo</div>}
-            {user.profilePicture && isEditing && (
-              <div className="changePhotoText">Change Photo</div>
-            )}
+      <div className="profilePictureWrapper">
+        {/* <img
+          src={user.profilePicture ? `/public/uploads/${user.profilePicture}` : "/default-profile.jpg"}
+          alt="Profile"
+          className="profilePicture"
+        />
+        {!user.profilePicture && (
+          <div className="addPhotoText" onClick={() => setShowProfilePictureModal(true)}>
+            Add Photo
           </div>
-        </label>
+        )}
+        {user.profilePicture && isEditing && (
+          <div className="changePhotoText" onClick={() => setShowProfilePictureModal(true)}>
+            Change Photo
+          </div>
+        )} */}
         <input
           type="file"
           id="profilePictureInput"
           accept="image/*"
-          onChange={handleImageChange}
+          onChange={(e) => {
+            setSelectedProfilePicture(e.target.files[0]);
+            console.log('Selected profile picture:', e.target.files[0]);
+            handleSaveClick();
+          }}
           style={{ display: "none" }}
         />
+        {/* <label htmlFor="profilePictureInput" className="uploadButton">
+          {user.profilePicture ? "Change Photo" : "Upload Photo"}
+        </label> */}
       </div>
+    </div>
       <div className="userDetails">
         <label>First Name</label>
         <input
@@ -167,10 +157,36 @@ const UserAccountPage = () => {
           </button>
         )}
       </div>
-    </div>
-  );
+
+      {showProfilePictureModal && (
+      <div className="profile-picture-modal">
+        <div className="modal-content">
+          <h3>Select Profile Picture</h3>
+          <div className="profile-picture-options">
+            {availableProfilePictures.map((pictureUrl, index) => (
+              <div
+                key={index}
+                className={`profile-picture-option ${selectedProfilePicture === pictureUrl ? 'selected' : ''}`}
+                onClick={() => handleProfilePictureSelect(pictureUrl)}
+              >
+                <img src={pictureUrl} alt={`Profile Picture ${index + 1}`} />
+              </div>
+            ))}
+          </div>
+          <div className="modal-actions">
+            <button className="cancelButton" onClick={() => setShowProfilePictureModal(false)}>
+              Cancel
+            </button>
+            <button className="saveButton" onClick={() => handleSaveClick()}>
+              Save
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
+  </div>
+);
 };
 
 export default UserAccountPage;
-
 

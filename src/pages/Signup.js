@@ -11,6 +11,7 @@ export default function SignUp() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [userType, setUserType] = useState("");
   const [secretKey, setSecretKey] = useState("");
+  const [secretKeyError, setSecretKeyError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
@@ -41,6 +42,7 @@ export default function SignUp() {
           email,
           password,
           userType,
+          secretKey,
         }),
       });
 
@@ -51,18 +53,24 @@ export default function SignUp() {
         setPasswordError(""); // Clear the password error message
         window.location.href = "/login"; // Redirect to the login page
       } else {
-        throw new Error(data.error || "Something went wrong");
+        if (data.error === 'Invalid secret key') {
+          setSecretKeyError("Invalid secret key"); // Set the secret key error message
+        } else {
+          throw new Error(data.error || "Something went wrong");
+        }
       }
     } catch (error) {
       console.error("Error during fetch:", error);
       alert("Something went wrong");
     }
   };
+
   const validatePassword = (password) => {
     // Regular expression pattern for password validation
     const passwordPattern = /^(?=.*[A-Z])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{8,}$/;
     return passwordPattern.test(password);
   };
+
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
@@ -70,7 +78,6 @@ export default function SignUp() {
   return (
     <div className="auth-wrapper">
       <div className="auth-inner">
-        {/* <div className="header"> */}
         <div className="text-center">
           <div className="text">Sign Up</div>
         </div>
@@ -94,28 +101,21 @@ export default function SignUp() {
               Admin
             </div>
             {userType === "Admin" && (
-              <div className="input">
-                <img src="key.png" alt="" />
-                <input
-                  type="text"
-                  className="form-control"
-                  placeholder="Secret Key"
-                  value={secretKey}
-                  onChange={(e) => setSecretKey(e.target.value)}
-                />
-              </div>
-            )}
-            {/* <div className="input">
-            <img src="personlogin.png" alt="" />
-              <input
-                type="text"
-                className="form-control"
-                placeholder="Name"
-                value={fname}
-                onChange={(e) => setName(e.target.value)}
-              />
-            </div> */}
-            <div className="input">
+  <>
+    <div className="input">
+      <img src="key.png" alt="" />
+      <input
+        type="text"
+        className="form-control"
+        placeholder="Secret Key"
+        value={secretKey}
+        onChange={(e) => setSecretKey(e.target.value)}
+      />
+    </div>
+    {secretKeyError && <p className="error-message">{secretKeyError}</p>}
+  </>
+)}
+<div className="input">
   <img src="personlogin.png" alt="" />
   <input
     type="text"

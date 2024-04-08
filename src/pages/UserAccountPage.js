@@ -12,6 +12,8 @@ const UserAccountPage = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [showProfilePictureModal, setShowProfilePictureModal] = useState(false);
   const [selectedProfilePicture, setSelectedProfilePicture] = useState(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   // You can store the available profile pictures in an array
   const availableProfilePictures = [
@@ -26,15 +28,21 @@ const UserAccountPage = () => {
     const fetchUserData = async () => {
       try {
         const token = localStorage.getItem("token");
-        const response = await axios.post("http://localhost:5432/userData", { token });
-        if (response.data.status === "ok") {
-          const { fname, lname, email, profilePicture } = response.data.data;
-          setUser({ fname, lname, email, profilePicture });
+        if (token) {
+          const response = await axios.post("http://localhost:5432/userData", { token });
+          if (response.data.status === "ok") {
+            const { fname, lname, email, profilePicture } = response.data.data;
+            setUser({ fname, lname, email, profilePicture });
+            setIsLoggedIn(true);
+          } else {
+            setErrorMessage("Please log in to view your account details");
+          }
         } else {
-          console.error("Failed to fetch user data");
+          setErrorMessage("Please log in to view your account details");
         }
       } catch (error) {
         console.error("Error fetching user data:", error);
+        setErrorMessage("Please log in to view your account details");
       }
     };
     fetchUserData();
@@ -80,112 +88,100 @@ const UserAccountPage = () => {
 
   return (
     <div className="userAccountContainer">
-      <h2>Account Details</h2>
-      <div className="userProfile">
-      <div className="profilePictureWrapper">
-        {/* <img
-          src={user.profilePicture ? `/public/uploads/${user.profilePicture}` : "/default-profile.jpg"}
-          alt="Profile"
-          className="profilePicture"
-        />
-        {!user.profilePicture && (
-          <div className="addPhotoText" onClick={() => setShowProfilePictureModal(true)}>
-            Add Photo
+      {isLoggedIn ? (
+        <>
+          <h2>Account Details</h2>
+          <div className="userProfile">
+            <div className="profilePictureWrapper">
+              <input
+                type="file"
+                id="profilePictureInput"
+                accept="image/*"
+                onChange={(e) => {
+                  setSelectedProfilePicture(e.target.files[0]);
+                  console.log('Selected profile picture:', e.target.files[0]);
+                  handleSaveClick();
+                }}
+                style={{ display: "none" }}
+              />
+            </div>
           </div>
-        )}
-        {user.profilePicture && isEditing && (
-          <div className="changePhotoText" onClick={() => setShowProfilePictureModal(true)}>
-            Change Photo
+          <div className="userDetails">
+            <label>First Name</label>
+            <input
+              type="text"
+              value={user.fname}
+              readOnly={!isEditing}
+              onChange={(e) => setUser({ ...user, fname: e.target.value })}
+            />
           </div>
-        )} */}
-        <input
-          type="file"
-          id="profilePictureInput"
-          accept="image/*"
-          onChange={(e) => {
-            setSelectedProfilePicture(e.target.files[0]);
-            console.log('Selected profile picture:', e.target.files[0]);
-            handleSaveClick();
-          }}
-          style={{ display: "none" }}
-        />
-        {/* <label htmlFor="profilePictureInput" className="uploadButton">
-          {user.profilePicture ? "Change Photo" : "Upload Photo"}
-        </label> */}
-      </div>
-    </div>
-      <div className="userDetails">
-        <label>First Name</label>
-        <input
-          type="text"
-          value={user.fname}
-          readOnly={!isEditing}
-          onChange={(e) => setUser({ ...user, fname: e.target.value })}
-        />
-      </div>
-      <div className="userDetails">
-        <label>Last Name</label>
-        <input
-          type="text"
-          value={user.lname}
-          readOnly={!isEditing}
-          onChange={(e) => setUser({ ...user, lname: e.target.value })}
-        />
-      </div>
-      <div className="userDetails">
-        <label>Email</label>
-        <input
-          type="email"
-          value={user.email}
-          readOnly={!isEditing}
-          onChange={(e) => setUser({ ...user, email: e.target.value })}
-        />
-      </div>
-      <div className="actionButtons">
-        {isEditing ? (
-          <>
-            <button className="saveButton" onClick={handleSaveClick}>
-              Save
-            </button>
-            <button className="cancelButton" onClick={() => setIsEditing(false)}>
-              Cancel
-            </button>
-          </>
-        ) : (
-          <button className="editButton" onClick={handleEditClick}>
-            Edit
-          </button>
-        )}
-      </div>
+          <div className="userDetails">
+            <label>Last Name</label>
+            <input
+              type="text"
+              value={user.lname}
+              readOnly={!isEditing}
+              onChange={(e) => setUser({ ...user, lname: e.target.value })}
+            />
+          </div>
+          <div className="userDetails">
+            <label>Email</label>
+            <input
+              type="email"
+              value={user.email}
+              readOnly={!isEditing}
+              onChange={(e) => setUser({ ...user, email: e.target.value })}
+            />
+          </div>
+          <div className="actionButtons">
+            {isEditing ? (
+              <>
+                <button className="saveButton" onClick={handleSaveClick}>
+                  Save
+                </button>
+                <button className="cancelButton" onClick={() => setIsEditing(false)}>
+                  Cancel
+                </button>
+              </>
+            ) : (
+              <button className="editButton" onClick={handleEditClick}>
+                Edit
+              </button>
+            )}
+          </div>
 
-      {showProfilePictureModal && (
-      <div className="profile-picture-modal">
-        <div className="modal-content">
-          <h3>Select Profile Picture</h3>
-          <div className="profile-picture-options">
-            {availableProfilePictures.map((pictureUrl, index) => (
-              <div
-                key={index}
-                className={`profile-picture-option ${selectedProfilePicture === pictureUrl ? 'selected' : ''}`}
-                onClick={() => handleProfilePictureSelect(pictureUrl)}
-              >
-                <img src={pictureUrl} alt={`Profile Picture ${index + 1}`} />
+          {showProfilePictureModal && (
+            <div className="profile-picture-modal">
+              <div className="modal-content">
+                <h3>Select Profile Picture</h3>
+                <div className="profile-picture-options">
+                  {availableProfilePictures.map((pictureUrl, index) => (
+                    <div
+                      key={index}
+                      className={`profile-picture-option ${selectedProfilePicture === pictureUrl ? 'selected' : ''}`}
+                      onClick={() => handleProfilePictureSelect(pictureUrl)}
+                    >
+                      <img src={pictureUrl} alt={`Profile Picture ${index + 1}`} />
+                    </div>
+                  ))}
+                </div>
+                <div className="modal-actions">
+                  <button className="cancelButton" onClick={() => setShowProfilePictureModal(false)}>
+                    Cancel
+                  </button>
+                  <button className="saveButton" onClick={() => handleSaveClick()}>
+                    Save
+                  </button>
+                </div>
               </div>
-            ))}
-          </div>
-          <div className="modal-actions">
-            <button className="cancelButton" onClick={() => setShowProfilePictureModal(false)}>
-              Cancel
-            </button>
-            <button className="saveButton" onClick={() => handleSaveClick()}>
-              Save
-            </button>
-          </div>
-        </div>
-      </div>
-    )}
-  </div>
-);
+            </div>
+          )}
+        </>
+      ) : (
+        <div className="errorMessage">{errorMessage}</div>
+      )}
+    </div>
+  );
 };
 
 export default UserAccountPage;

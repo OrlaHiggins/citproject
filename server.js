@@ -68,13 +68,16 @@ const User = mongoose.model('UserInfo');
 app.post('/register', async (req, res) => {
   console.log('Received registration request body:', req.body);
 
-  const { fname, lname, email, password, userType } = req.body;
+  const { fname, lname, email, password, userType, secretKey } = req.body;
 
   try {
     const oldUser = await User.findOne({ email });
 
     if (oldUser) {
       return res.status(400).json({ error: 'User already exists' });
+    }
+    if (userType === 'Admin' && secretKey !== 'CITproject') {
+      return res.status(400).json({ error: 'Invalid secret key' });
     }
 
     const salt = await bcrypt.genSalt(10);
@@ -446,6 +449,7 @@ app.post('/createList', async (req, res) => {
 
     const decoded = jwt.verify(token, JWT_SECRET);
     const userId = decoded.userId || decoded._id;
+    const userType = decoded.userType;
 
     if (!userId) {
       console.error('Invalid token or missing userId');
@@ -474,6 +478,7 @@ app.post('/createList', async (req, res) => {
     const newList = await mongoose.model('List').create({
       name: listName,
       userId: new mongoose.Types.ObjectId(userId),
+      userType: userType, // Set the userType field based on the user's role
       items: selectedProducts.filter(product => product !== null).map(product => ({
         productId: product._id,
         title: product.product,
@@ -687,6 +692,18 @@ app.post('/lists/:listId/add-product', async (req, res) => {
     res.status(500).json({ error: 'Failed to add product to list. Please try again later.' });
   }
 });
+app.get('/adminLists', async (req, res) => {
+  try {
+    // Retrieve admin-created lists from the database
+    const adminLists = await mongoose.model('List').find({ userType: 'admin' });
+
+    res.json({ status: 'ok', lists: adminLists });
+  } catch (error) {
+    console.error('Error fetching admin lists:', error);
+    res.status(500).json({ status: 'error', error: 'Failed to fetch admin lists' });
+  }
+});
+
 
 const PORT = process.env.PORT || 5432;
 app.listen(PORT, () => {

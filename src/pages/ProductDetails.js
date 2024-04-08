@@ -12,6 +12,8 @@ const ProductDetails = () => {
   const [error, setError] = useState(null);
   const [isAdmin, setIsAdmin] = useState(false); // State to track admin status
   const [showListPopup, setShowListPopup] = useState(false);
+  const [isSignedIn, setIsSignedIn] = useState(false);
+  const [showMessage, setShowMessage] = useState(false);
   
 
   useEffect(() => {
@@ -27,6 +29,7 @@ const ProductDetails = () => {
 
     // Check if user is admin
     const token = localStorage.getItem('token');
+    setIsSignedIn(!!token);
     if (token) {
       // Make a request to the backend to verify user's admin status
       axios.post('http://localhost:5432/userData', { token })
@@ -52,7 +55,11 @@ const ProductDetails = () => {
     return <p>Loading...</p>;
   }
   const handleAddToList = () => {
-    setShowListPopup(true);
+    if (isSignedIn) {
+      setShowListPopup(true);
+    } else {
+      setShowMessage(true);
+    }
   };
   const handleCloseListPopup = () => {
     setShowListPopup(false);
@@ -85,14 +92,19 @@ const ProductDetails = () => {
             </a>
           </div>
         )}
-{isAdmin ? (
-  <Link to="/admin/products">
-    <button className="update-product-btn">Update Product</button>
-  </Link>
-) : (
-  <button className="add-to-cart-btn" onClick={handleAddToList}>
-  Add to list
-</button>
+        {isAdmin ? (
+          <Link to="/admin/products">
+            <button className="update-product-btn">Update Product</button>
+          </Link>
+        ) : (
+          <div>
+            <button className="add-to-cart-btn" onClick={handleAddToList}>
+              Add to list
+            </button>
+            {showMessage && (
+              <p className="sign-in-message">You must sign in to upload this products to your list</p>
+            )}
+          </div>
         )}
       </div>
       {showListPopup && (

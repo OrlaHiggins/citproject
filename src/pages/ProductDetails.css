@@ -1,48 +1,103 @@
 .product-details-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin: 2rem;
-  }
-  
-  .product-details-image {
-    max-width: 400px;
-    max-height: 400px;
-    object-fit: contain;
-    margin-bottom: 1rem;
-  }
-  
-  .product-details-info {
-    text-align: center;
-  }
-  
-  .product-details-info h1 {
-    font-size: 2rem;
-    margin-bottom: 0.5rem;
-  }
-  
-  .product-details-info p {
-    font-size: 1.2rem;
-    margin-bottom: 0.5rem;
-  }
-  
-  .add-to-cart-btn {
-    background-color: #4CAF50;
-    color: white;
-    padding: 0.5rem 1rem;
-    border: none;
-    border-radius: 4px;
-    font-size: 1rem;
-    cursor: pointer;
-    margin-top: 1rem;
-  }
-  .update-product-btn {
-    background-color: #4CAF50;
-    color: white;
-    padding: 0.5rem 1rem;
-    border: none;
-    border-radius: 4px;
-    font-size: 1rem;
-    cursor: pointer;
-    margin-top: 1rem;
-  }
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 2rem;
+  padding: 2rem;
+  background-color: #f5f5f5;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.product-details-image-container {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.product-details-image {
+  max-width: 500px;
+  max-height: 500px;
+  object-fit: contain;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.product-details-info {
+  text-align: center;
+}
+
+.product-details-info h1 {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+.product-details-info p {
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+}
+
+.product-details-website {
+  margin-top: 1rem;
+}
+
+.product-details-website h3 {
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+}
+
+.product-details-website a {
+  color: #4caf50;
+  text-decoration: none;
+}
+
+.product-details-website a:hover {
+  color: #45a049;
+}
+
+.add-to-list-btn {
+  background-color: #4caf50;
+  color: white;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-top: 1rem;
+}
+
+.add-to-list-btn:hover {
+  background-color: #45a049;
+}
+
+.update-product-btn {
+  background-color: #4caf50;
+  color: white;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-top: 1rem;
+}
+
+.update-product-btn:hover {
+  background-color: #45a049;
+}
+
+.back-arrow {
+  position: absolute;
+  top: 5.5rem;
+  left: 1.5rem;
+  font-size: 24px;
+  color: #000;
+  text-decoration: none;
+}
+
+.back-arrow:hover {
+  color: #555;
+}
+
+.sign-in-message {
+  color: #ff0000;
+  margin-top: 1rem;
+}

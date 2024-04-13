@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { useHistory } from 'react';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { useHistory } from "react";
 
 function EditList({ match }) {
-  const [product, setProduct] = useState('');
-  const [description, setDescription] = useState('');
-  const [category, setCategory] = useState('');
-  const [error, setError] = useState('');
+  const [product, setProduct] = useState("");
+  const [description, setDescription] = useState("");
+  const [category, setCategory] = useState("");
+  const [error, setError] = useState("");
   const history = useHistory();
 
   // Define productId within the component
@@ -15,14 +15,16 @@ function EditList({ match }) {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const response = await axios.get(`http://localhost:5432/products/${productId}`);
+        const response = await axios.get(
+          `http://localhost:5432/products/${productId}`
+        );
         const { product, description, category } = response.data;
         setProduct(product);
         setDescription(description);
         setCategory(category);
       } catch (err) {
-        console.error('Error fetching product:', err);
-        setError('Failed to fetch product');
+        console.error("Error fetching product:", err);
+        setError("Failed to fetch product");
       }
     };
 
@@ -34,23 +36,23 @@ function EditList({ match }) {
 
     try {
       const updatedProduct = { product, description, category };
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
 
       const response = await axios.put(
         `http://localhost:5432/products/${productId}`,
         updatedProduct,
         {
           headers: {
-            Authorization: `Bearer ${token}`
-          }
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
 
       console.log(response.data);
-      history.push('/admin-product-list');
+      history.push("/admin-product-list");
     } catch (err) {
-      console.error('Error updating product:', err);
-      setError('Failed to update product. Please try again later.');
+      console.error("Error updating product:", err);
+      setError("Failed to update product. Please try again later.");
     }
   };
 
@@ -95,4 +97,3 @@ function EditList({ match }) {
 }
 
 export default EditList;
-

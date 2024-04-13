@@ -1,37 +1,73 @@
+/* Base styles for admin dashboard */
 .admin-dashboard {
-    background-color: #f8f9fa;
-    padding: 20px;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-  }
-  
+  background-color: #f8f9fa;
+  padding: 20px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-image: url('/sale.jpeg');
+  background-size: 120%; 
+  background-position: center;
+  position: relative; 
+}
+
+/* Styling for the welcome message */
+.admin-dashboard h1 {
+  font-size: 48px;
+  margin-bottom: 20px; 
+  color: #333;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  top: 140px; 
+  left: 200px; 
+}
+
+
+/* Container for admin action buttons */
+.admin-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 40px; 
+}
+
+/* Styling for each admin action button */
+.admin-actions button {
+  padding: 20px 40px;
+  font-size: 24px;
+  background-color: #ff9800;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.3s;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Hover effect for admin action buttons */
+.admin-actions button:hover {
+  background-color: #f57c00;
+  transform: translateY(-5px);
+}
+
+/* Media query for responsive design */
+@media (max-width: 768px) {
   .admin-dashboard h1 {
-    font-size: 36px;
-    margin-bottom: 40px;
-    color: #333;
+    font-size: 36px; 
   }
-  
+
   .admin-actions {
-    display: flex;
     flex-direction: column;
-    align-items: center;
-    gap: 20px;
+    align-items: center; 
+    margin-top: 20px; 
   }
-  
+
   .admin-actions button {
-    padding: 15px 30px;
-    font-size: 18px;
-    background-color: #4285f4;
-    color: #fff;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s;
+    width: 100%; 
+    margin-bottom: 20px; 
   }
-  
-  .admin-actions button:hover {
-    background-color: #3367d6;
-  }
+}
+
+

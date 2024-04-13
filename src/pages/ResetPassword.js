@@ -1,34 +1,24 @@
 import React, { Component } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faEye,
-  faEyeSlash,
-  faEnvelope,
-  faLock,
-} from "@fortawesome/free-solid-svg-icons";
+import { faEye, faEyeSlash, faLock, faEnvelope } from "@fortawesome/free-solid-svg-icons";
 import "./LoginPage.css";
 
-export default class Login extends Component {
+export default class ResetPassword extends Component {
   constructor(props) {
     super(props);
-
-    const queryParams = new URLSearchParams(window.location.search);
-    const emailFromParam = queryParams.get("email");
-
     this.state = {
-      email: emailFromParam || "",
-      password: "",
+      email: "",
+      newPassword: "",
       error: "",
       showPassword: false,
     };
-
     this.handleSubmit = this.handleSubmit.bind(this);
   }
 
   handleSubmit(e) {
     e.preventDefault();
-    const { email, password } = this.state;
-    fetch("http://localhost:5432/login-user", {
+    const { email, newPassword } = this.state;
+    fetch("http://localhost:5432/reset-password", {
       method: "POST",
       crossDomain: true,
       headers: {
@@ -36,24 +26,14 @@ export default class Login extends Component {
         Accept: "application/json",
         "Access-Control-Allow-Origin": "*",
       },
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({ email, newPassword }),
     })
       .then((res) => res.json())
       .then((data) => {
-        console.log(data, "userRegister");
-        console.log("User Type:", data.userType);
-        if (data.status === "ok") {
-          window.localStorage.setItem("token", data.data);
-          // Check if userType is defined and is 'admin' (case-insensitive)
-          if (data.userType && data.userType.toLowerCase() === "admin") {
-            window.location.href = "./admin";
-          } else {
-            window.location.href = "./account";
-          }
+        if (data.message === "Password reset successful") {
+          window.location.href = "./login";
         } else {
-          this.setState({
-            error: "Incorrect username or password. Please try again.",
-          });
+          this.setState({ error: data.error });
         }
       });
   }
@@ -68,7 +48,7 @@ export default class Login extends Component {
       <div className="auth-wrapper">
         <div className="auth-inner">
           <div className="text-center">
-            <div className="text">Login</div>
+            <div className="text">Reset Password</div>
           </div>
           <form onSubmit={this.handleSubmit}>
             <div className="inputs">
@@ -86,8 +66,8 @@ export default class Login extends Component {
                 <input
                   type={showPassword ? "text" : "password"}
                   className="form-control"
-                  placeholder="Password"
-                  onChange={(e) => this.setState({ password: e.target.value })}
+                  placeholder="New Password"
+                  onChange={(e) => this.setState({ newPassword: e.target.value })}
                 />
                 <FontAwesomeIcon
                   icon={showPassword ? faEyeSlash : faEye}
@@ -95,20 +75,12 @@ export default class Login extends Component {
                   onClick={this.togglePasswordVisibility}
                 />
               </div>
-              {this.state.error && (
-                <div className="error">{this.state.error}</div>
-              )}
+              {this.state.error && <div className="error">{this.state.error}</div>}
               <div className="submit-container">
                 <button type="submit" className="submit">
-                  Submit
+                  Reset Password
                 </button>
               </div>
-              <p className="forgot-password">
-                Forgot password? <a href="/reset-password">Reset here</a>
-              </p>
-              <p className="forgot-password">
-                Don't have an account? <a href="/signup">Sign up here</a>
-              </p>
             </div>
           </form>
         </div>

@@ -8,7 +8,7 @@
 .search-bar {
   background-color: #4caf50;
   color: #fff;
-  padding: 10px;
+  padding: 20px;
   text-align: right;
   /* border-radius: 20px; Adjust the border-radius for a more rounded appearance */
 }
@@ -49,17 +49,44 @@
   border-radius: 5px;
   margin-bottom: 10px;
 }
+.my-lists-banner {
+  background-color: rgb(173, 226, 152);
+  padding: 20px;
+  text-align: center;
+  margin-top: 40px;
+  margin-bottom: 20px;
+  color: #fff;
+}
+
+.my-lists-banner h3 {
+  font-size: 24px;
+  margin: 0;
+}
 
 .your-lists {
-  margin-top: 20px;
-  margin-left: 20px; /* Add more padding at the top */
-  margin-bottom: 20px; /* Add margin at the bottom for spacing */
+  margin-left: 0px;
+  margin-bottom: 40px;
 }
 
-.your-lists h3 {
-  font-size: 24px; /* Increase the font size */
-  margin-bottom: 10px; /* Add some spacing below the heading */
+.previous-lists-banner {
+  background-color: rgb(173, 226, 152);
+  padding: 20px;
+  text-align: center;
+  margin-top: 60px;
+  margin-bottom: 20px;
+  color: #fff;
 }
+
+.previous-lists-banner h3 {
+  font-size: 24px;
+  margin: 0;
+}
+
+.previous-lists {
+  margin-left: 20px;
+  margin-bottom: 20px;
+}
+
 
 .folders-grid {
   display: grid;
@@ -93,31 +120,88 @@
 /* Popup modal styles */
 .popup-container {
   position: fixed;
-  z-index: 1;
-  left: 0;
   top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.4);
   display: flex;
   justify-content: center;
   align-items: center;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 9999;
 }
 
 .popup {
-  background-color: #fff;
+  background-color: white;
   padding: 20px;
-  border-radius: 5px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  max-width: 400px;
+  width: 100%;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
-.list-box {
-  background-color: #f2f2f2;
+
+.popup h3 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  font-size: 18px;
+}
+
+.input-field {
+  width: 100%;
   padding: 10px;
-  border-radius: 5px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.input-field.error {
+  border-color: red;
+}
+
+.error-message {
+  color: red;
+  margin-top: 8px;
+  font-size: 14px;
+}
+
+.category-list {
   margin-bottom: 20px;
+}
+
+.category-item {
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.category-name {
+  margin-left: 8px;
+}
+
+.button-container {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.confirm-button,
+.cancel-button {
+  padding: 10px 20px;
+  border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.confirm-button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  margin-right: 10px;
+}
+
+.cancel-button {
+  background-color: #f0f0f0;
+  color: #333;
+  border: none;
 }
 
 .list-box h4 {
@@ -176,17 +260,65 @@
 }
 .list-box {
   position: relative;
-  /* Add any other styles for the list box */
+  display: flex;
+  flex-direction: column;
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
 }
 
 .list-header {
-  position: relative;
-  /* Add any other styles for the list header */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
 }
 
 .list-name {
   margin: 0;
-  /* Add any other styles for the list name */
+  font-size: 18px;
+}
+
+.list-date {
+  font-size: 14px;
+  color: #888;
+}
+
+.list-box ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 10px 0;
+}
+
+.list-box li {
+  display: flex;
+  align-items: center;
+  margin-bottom: 5px;
+}
+
+.bullet-icon {
+  margin-right: 5px;
+  color: #999;
+}
+
+.list-box p {
+  margin-top: auto;
+  margin-bottom: 0;
+  font-size: 14px;
+  color: #888;
+}
+
+.delete-icon {
+  color: grey;
+  cursor: pointer;
+  font-size: 18px;
+  transition: color 0.3s;
+}
+
+.delete-icon:hover {
+  color: #d00;
 }
 
 .delete-icon {
@@ -204,5 +336,21 @@
 
 .list-link:hover {
   color: inherit; /* Ensures link color doesn't change on hover */
+}
+
+.list-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  padding: 10px;
+  background-color: #f9f9f9;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.list-info {
+  display: flex;
+  align-items: baseline;
 }
 

@@ -77,16 +77,18 @@ export const Navbar = () => {
   };
 
   return (
-    <nav className="navbar">
-      <div className="nav-content">
-        {isAdmin ? (
-          <Link to="/admin" className="title">
-            Trolley Tracker
-          </Link>
-        ) : (
-          <Link to="/" className="title">
-            Trolley Tracker
-          </Link>
+<nav className="navbar">
+  <div className="nav-content">
+    {isAdmin ? (
+      <Link to="/" className="title" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
+        <img src="/white-background.png" alt="Trolley Tracker Logo" style={{ height: '70px', marginRight: '10px' }} />
+        <span>Trolley Tracker</span>
+      </Link>
+    ) : (
+      <Link to="/" className="title" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
+        <img src="/white-background.png" alt="Trolley Tracker Logo" style={{ height: '70px', marginRight: '10px' }} />
+        <span>Trolley Tracker</span>
+      </Link>
         )}
         <div className="nav-links">
           <ul>

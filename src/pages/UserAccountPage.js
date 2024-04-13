@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from 'axios';
+import axios from "axios";
 import "./UserAccountPage.css";
 
 const UserAccountPage = () => {
@@ -10,80 +10,95 @@ const UserAccountPage = () => {
     profilePicture: "",
   });
   const [isEditing, setIsEditing] = useState(false);
-  const [showProfilePictureModal, setShowProfilePictureModal] = useState(false);
   const [selectedProfilePicture, setSelectedProfilePicture] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
-  // You can store the available profile pictures in an array
-  const availableProfilePictures = [
-    "/uploads/pandaavatar.png",
-    "/public/uploads/foxavatar.png",
-    "/public/uploads/catblue.png",
-    "/public/uploads/bear.png",
-  ];
-
   useEffect(() => {
-    // Fetch user data from the server and update state
-    const fetchUserData = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        if (token) {
-          const response = await axios.post("http://localhost:5432/userData", { token });
-          if (response.data.status === "ok") {
-            const { fname, lname, email, profilePicture } = response.data.data;
-            setUser({ fname, lname, email, profilePicture });
-            setIsLoggedIn(true);
-          } else {
-            setErrorMessage("Please log in to view your account details");
-          }
-        } else {
-          setErrorMessage("Please log in to view your account details");
-        }
-      } catch (error) {
-        console.error("Error fetching user data:", error);
-        setErrorMessage("Please log in to view your account details");
-      }
-    };
     fetchUserData();
   }, []);
+
+  const fetchUserData = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      console.log("Token from local storage:", token);
+
+      if (token) {
+        const response = await axios.post("http://localhost:5432/userData", {
+          token,
+        });
+        console.log("Response from server:", response.data);
+
+        if (response.data.status === "ok") {
+          const { fname, lname, email, profilePicture } = response.data.data;
+          setUser({ fname, lname, email, profilePicture });
+          setIsLoggedIn(true);
+        } else if (
+          response.data.status === "error" &&
+          response.data.error === "User not found"
+        ) {
+          // If the user is not found, clear the user data and set isLoggedIn to false
+          setUser({
+            fname: "",
+            lname: "",
+            email: "",
+            profilePicture: "",
+          });
+          setIsLoggedIn(false);
+          setErrorMessage("User not found. Please log in again.");
+        } else {
+          setErrorMessage("Failed to fetch user data");
+        }
+      } else {
+        setIsLoggedIn(false);
+        setErrorMessage("Please log in to view your account details");
+      }
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+      setErrorMessage("Failed to fetch user data");
+    }
+  };
 
   const handleEditClick = () => {
     setIsEditing(true);
   };
 
+  const handleProfilePictureChange = (event) => {
+    const file = event.target.files[0];
+    setSelectedProfilePicture(file);
+  };
+
   const handleSaveClick = async () => {
     try {
       const token = localStorage.getItem("token");
+      const formData = new FormData();
+      formData.append("fname", user.fname);
+      formData.append("lname", user.lname);
+      formData.append("email", user.email);
+      if (selectedProfilePicture) {
+        formData.append("profilePicture", selectedProfilePicture);
+      }
+
       const response = await axios.put(
         "http://localhost:5432/updateUser",
-        {
-          fname: user.fname,
-          lname: user.lname,
-          email: user.email || '', // Ensure email is not empty
-          profilePicture: selectedProfilePicture || user.profilePicture,
-        },
+        formData,
         {
           headers: {
             Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
           },
         }
       );
-  
+
       if (response.status === 200) {
         setIsEditing(false);
-        setUser({ ...user, profilePicture: selectedProfilePicture || user.profilePicture });
+        setUser(response.data.user);
       } else {
-        console.error("Failed to update user details");
+        console.error("Failed to update user information");
       }
     } catch (error) {
-      console.error("Error updating user details:", error);
+      console.error("Error updating user information:", error);
     }
-  };
-
-  const handleProfilePictureSelect = (pictureUrl) => {
-    setSelectedProfilePicture(pictureUrl);
-    setShowProfilePictureModal(false);
   };
 
   return (
@@ -93,17 +108,26 @@ const UserAccountPage = () => {
           <h2>Account Details</h2>
           <div className="userProfile">
             <div className="profilePictureWrapper">
-              <input
-                type="file"
-                id="profilePictureInput"
-                accept="image/*"
-                onChange={(e) => {
-                  setSelectedProfilePicture(e.target.files[0]);
-                  console.log('Selected profile picture:', e.target.files[0]);
-                  handleSaveClick();
-                }}
-                style={{ display: "none" }}
+              <img
+                className="profilePicture"
+                src={user.profilePicture || "/default-profile-picture.png"}
+                alt="Profile"
               />
+              {isEditing && (
+                <label
+                  htmlFor="profilePictureInput"
+                  className="changePhotoText"
+                >
+                  Change Photo
+                  <input
+                    id="profilePictureInput"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleProfilePictureChange}
+                    style={{ display: "none" }}
+                  />
+                </label>
+              )}
             </div>
           </div>
           <div className="userDetails">
@@ -139,7 +163,10 @@ const UserAccountPage = () => {
                 <button className="saveButton" onClick={handleSaveClick}>
                   Save
                 </button>
-                <button className="cancelButton" onClick={() => setIsEditing(false)}>
+                <button
+                  className="cancelButton"
+                  onClick={() => setIsEditing(false)}
+                >
                   Cancel
                 </button>
               </>
@@ -149,33 +176,6 @@ const UserAccountPage = () => {
               </button>
             )}
           </div>
-
-          {showProfilePictureModal && (
-            <div className="profile-picture-modal">
-              <div className="modal-content">
-                <h3>Select Profile Picture</h3>
-                <div className="profile-picture-options">
-                  {availableProfilePictures.map((pictureUrl, index) => (
-                    <div
-                      key={index}
-                      className={`profile-picture-option ${selectedProfilePicture === pictureUrl ? 'selected' : ''}`}
-                      onClick={() => handleProfilePictureSelect(pictureUrl)}
-                    >
-                      <img src={pictureUrl} alt={`Profile Picture ${index + 1}`} />
-                    </div>
-                  ))}
-                </div>
-                <div className="modal-actions">
-                  <button className="cancelButton" onClick={() => setShowProfilePictureModal(false)}>
-                    Cancel
-                  </button>
-                  <button className="saveButton" onClick={() => handleSaveClick()}>
-                    Save
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
         </>
       ) : (
         <div className="errorMessage">{errorMessage}</div>
@@ -185,4 +185,3 @@ const UserAccountPage = () => {
 };
 
 export default UserAccountPage;
-

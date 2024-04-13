@@ -5,6 +5,7 @@
 
 .template_Container {
   padding: 40px;
+  overflow-x: auto;
 }
 
 table {
@@ -51,28 +52,30 @@ td {
   }
 
   table {
-    display: flex;
-    flex-wrap: wrap;
+    display: block;
+    width: 100%;
   }
 
   thead {
     display: none;
   }
 
+  tbody {
+    display: block;
+    width: 100%;
+  }
+
   tr {
-    display: flex;
-    flex-direction: column;
+    display: block;
     width: 100%;
     margin-bottom: 20px;
     border: 1px solid #ccc;
   }
 
   td {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px;
+    display: block;
     text-align: left;
+    padding: 10px;
     border-bottom: none;
   }
 
@@ -80,6 +83,8 @@ td {
     content: attr(data-label);
     font-weight: bold;
     margin-right: 10px;
+    display: inline-block;
+    width: 100px;
   }
 
   .product-image {

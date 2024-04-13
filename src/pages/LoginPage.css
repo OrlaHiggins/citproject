@@ -2,10 +2,9 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin: auto;
-  margin-top: 50px;
+  margin: 50px auto 0; /* Adjusts the top margin */
   background: #fff;
-  padding-bottom: 30px;
+  padding: 30px; /* Added padding */
   box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.1);
   border-radius: 10px;
 }
@@ -82,7 +81,7 @@
   width: 220px;
   height: 50px;
   color: #fff;
-  background: #4CAF50;
+  background: #4caf50;
   border-radius: 50px;
   font-size: 16px;
   font-weight: 700;
@@ -92,15 +91,67 @@
 }
 
 .error {
-  color: #ff0000;
+  color: #b9b4b4;
   font-size: 14px;
   margin-top: 10px;
   text-align: center;
 }
+
 .error-message {
-  color: red;
+  color: #b9b4b4;
 }
 
 .text-center {
   text-align: center;
+}
+
+.text {
+  font-size: 32px;
+  font-weight: bold;
+  color: #333;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+  margin-bottom: 30px;
+}
+.user-type-container {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.user-type-label {
+  font-weight: bold;
+  margin-right: 10px;
+}
+
+.user-type-options {
+  display: flex;
+  align-items: center;
+}
+
+.user-type-option {
+  display: flex;
+  align-items: center;
+  margin-right: 20px;
+}
+
+.user-type-option input[type="radio"] {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid #ccc;
+  outline: none;
+  cursor: pointer;
+  margin-right: 5px;
+}
+
+.user-type-option input[type="radio"]:checked {
+  background-color: #4caf50;
+  border-color: #4caf50;
+}
+
+.user-type-option label {
+  cursor: pointer;
 }

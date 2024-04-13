@@ -54,9 +54,9 @@ const AdminDashboard = () => {
     <div className="admin-dashboard">
       <h1>Welcome Back Admin User</h1>
       <div className="admin-actions">
-        <button onClick={handleDeleteUsers}>Manage Users</button>
-        <button onClick={handleDeleteProducts}>Manage Products</button>
         <button onClick={handleAddProduct}>Add Product</button>
+        <button onClick={handleDeleteProducts}>Manage Products</button>
+        <button onClick={handleDeleteUsers}>Manage Users</button>
       </div>
     </div>
   );

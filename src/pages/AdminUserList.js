@@ -1,32 +1,32 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTrashAlt, faPenToSquare } from '@fortawesome/free-solid-svg-icons';
-import './AdminUserList.css';
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faTrashAlt, faPenToSquare } from "@fortawesome/free-solid-svg-icons";
+import "./AdminUserList.css";
 
 function AdminUserList() {
   const [users, setUsers] = useState([]);
   const [error, setError] = useState(null);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [isAdmin, setIsAdmin] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [editUserId, setEditUserId] = useState(null);
   const [editedUser, setEditedUser] = useState({
-    fname: '',
-    lname: '',
-    email: '',
-    userType: '',
+    fname: "",
+    lname: "",
+    email: "",
+    userType: "",
   });
 
   useEffect(() => {
     const fetchUserData = async () => {
-      const token = window.localStorage.getItem('token');
+      const token = window.localStorage.getItem("token");
       if (token) {
         try {
-          const response = await fetch('http://localhost:5432/userData', {
-            method: 'POST',
+          const response = await fetch("http://localhost:5432/userData", {
+            method: "POST",
             headers: {
-              'Content-Type': 'application/json',
+              "Content-Type": "application/json",
             },
             body: JSON.stringify({ token }),
           });
@@ -34,9 +34,9 @@ function AdminUserList() {
           const data = await response.json();
 
           if (
-            data.status === 'ok' &&
+            data.status === "ok" &&
             data.data.userType &&
-            data.data.userType.toLowerCase() === 'admin'
+            data.data.userType.toLowerCase() === "admin"
           ) {
             setIsAdmin(true);
             fetchUsers(); // Call fetchUsers if the user is an admin
@@ -45,7 +45,7 @@ function AdminUserList() {
             // Redirect to the login page or display an error message
           }
         } catch (error) {
-          console.error('Error during fetch:', error);
+          console.error("Error during fetch:", error);
           // Handle error
         }
       } else {
@@ -61,43 +61,46 @@ function AdminUserList() {
 
   const fetchUsers = async () => {
     try {
-      const token = window.localStorage.getItem('token');
-      const response = await axios.get('http://localhost:5432/users', {
+      const token = window.localStorage.getItem("token");
+      const response = await axios.get("http://localhost:5432/users", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
       setUsers(response.data);
     } catch (error) {
-      setError('Failed to fetch users');
-      console.error('Error fetching users:', error);
+      setError("Failed to fetch users");
+      console.error("Error fetching users:", error);
     }
   };
 
   const handleDeleteUser = async (userId) => {
     try {
-      const token = window.localStorage.getItem('token');
+      const token = window.localStorage.getItem("token");
       if (!token) {
-        console.error('Token is missing. Redirecting to login page.');
+        console.error("Token is missing. Redirecting to login page.");
         // Redirect to the login page or display an error message
         return;
       }
 
-      console.log('Deleting user with ID:', userId);
+      console.log("Deleting user with ID:", userId);
 
       // Make the DELETE request to the backend endpoint
-      const response = await axios.delete(`http://localhost:5432/users/${userId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await axios.delete(
+        `http://localhost:5432/users/${userId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       console.log(response.data);
 
       // Remove the deleted user from the state
       setUsers(users.filter((user) => user._id !== userId));
     } catch (err) {
-      console.error('Error deleting user:', err);
+      console.error("Error deleting user:", err);
       // Handle error
     }
   };
@@ -123,13 +126,13 @@ function AdminUserList() {
 
   const handleSaveUser = async () => {
     try {
-      const token = window.localStorage.getItem('token');
+      const token = window.localStorage.getItem("token");
       if (!token) {
-        console.error('Token is missing. Redirecting to login page.');
+        console.error("Token is missing. Redirecting to login page.");
         // Redirect to the login page or display an error message
         return;
       }
-  
+
       const response = await axios.put(
         `http://localhost:5432/admin/users/${editUserId}`,
         editedUser,
@@ -139,23 +142,23 @@ function AdminUserList() {
           },
         }
       );
-  
+
       // Update the users state with the updated user data
       setUsers((prevUsers) =>
         prevUsers.map((user) =>
           user._id === editUserId ? response.data.user : user
         )
       );
-  
+
       setEditUserId(null);
       setEditedUser({
-        fname: '',
-        lname: '',
-        email: '',
-        userType: '',
+        fname: "",
+        lname: "",
+        email: "",
+        userType: "",
       });
     } catch (err) {
-      console.error('Error updating user:', err);
+      console.error("Error updating user:", err);
       // Handle error
     }
   };
@@ -163,10 +166,10 @@ function AdminUserList() {
   const handleCancelEdit = () => {
     setEditUserId(null);
     setEditedUser({
-      fname: '',
-      lname: '',
-      email: '',
-      userType: '',
+      fname: "",
+      lname: "",
+      email: "",
+      userType: "",
     });
   };
 
@@ -202,7 +205,9 @@ function AdminUserList() {
                   <tbody>
                     {users
                       .filter((user) =>
-                        user.email.toLowerCase().includes(searchTerm.toLowerCase())
+                        user.email
+                          .toLowerCase()
+                          .includes(searchTerm.toLowerCase())
                       )
                       .map((user) => (
                         <tr key={user._id}>
@@ -260,7 +265,9 @@ function AdminUserList() {
                             {editUserId === user._id ? (
                               <div className="buttons">
                                 <button onClick={handleSaveUser}>Save</button>
-                                <button onClick={handleCancelEdit}>Cancel</button>
+                                <button onClick={handleCancelEdit}>
+                                  Cancel
+                                </button>
                               </div>
                             ) : (
                               <div className="buttons">

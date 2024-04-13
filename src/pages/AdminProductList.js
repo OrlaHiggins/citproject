@@ -1,37 +1,37 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import { Link } from 'react-router-dom';
-import './AdminProductList.css'; // Import the CSS file
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTrashAlt } from '@fortawesome/free-solid-svg-icons';
-import { faPenToSquare } from '@fortawesome/free-regular-svg-icons';
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import { Link } from "react-router-dom";
+import "./AdminProductList.css"; // Import the CSS file
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faTrashAlt } from "@fortawesome/free-solid-svg-icons";
+import { faPenToSquare } from "@fortawesome/free-regular-svg-icons";
 
 function AdminProductList() {
   const [products, setProducts] = useState([]);
   const [error, setError] = useState(null);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [isAdmin, setIsAdmin] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [editProductId, setEditProductId] = useState(null);
   const [editedProduct, setEditedProduct] = useState({
-    product: '',
-    category: '',
-    price: '',
-    description: '',
-    websiteLink: '', // Include the websiteLink field
+    product: "",
+    category: "",
+    price: "",
+    description: "",
+    websiteLink: "", // Include the websiteLink field
     imageUrls: [],
-    storeId: '',
+    storeId: "",
   });
 
   useEffect(() => {
     const fetchUserData = async () => {
-      const token = window.localStorage.getItem('token');
+      const token = window.localStorage.getItem("token");
       if (token) {
         try {
-          const response = await fetch('http://localhost:5432/userData', {
-            method: 'POST',
+          const response = await fetch("http://localhost:5432/userData", {
+            method: "POST",
             headers: {
-              'Content-Type': 'application/json',
+              "Content-Type": "application/json",
             },
             body: JSON.stringify({ token }),
           });
@@ -39,9 +39,9 @@ function AdminProductList() {
           const data = await response.json();
 
           if (
-            data.status === 'ok' &&
+            data.status === "ok" &&
             data.data.userType &&
-            data.data.userType.toLowerCase() === 'admin'
+            data.data.userType.toLowerCase() === "admin"
           ) {
             setIsAdmin(true);
             fetchProducts(); // Call fetchProducts if the user is an admin
@@ -50,7 +50,7 @@ function AdminProductList() {
             // Redirect to the login page or display an error message
           }
         } catch (error) {
-          console.error('Error during fetch:', error);
+          console.error("Error during fetch:", error);
           // Handle error
         }
       } else {
@@ -66,38 +66,41 @@ function AdminProductList() {
 
   const fetchProducts = async () => {
     try {
-      const response = await axios.get('http://localhost:5432/products');
+      const response = await axios.get("http://localhost:5432/products");
       setProducts(response.data);
     } catch (error) {
-      setError('Failed to fetch products');
-      console.error('Error fetching products:', error);
+      setError("Failed to fetch products");
+      console.error("Error fetching products:", error);
     }
   };
 
   const handleDeleteProduct = async (productId) => {
     try {
-      const token = window.localStorage.getItem('token');
+      const token = window.localStorage.getItem("token");
       if (!token) {
-        console.error('Token is missing. Redirecting to login page.');
+        console.error("Token is missing. Redirecting to login page.");
         // Redirect to the login page or display an error message
         return;
       }
 
-      console.log('Deleting product with ID:', productId);
+      console.log("Deleting product with ID:", productId);
 
       // Make the DELETE request to the backend endpoint
-      const response = await axios.delete(`http://localhost:5432/products/${productId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await axios.delete(
+        `http://localhost:5432/products/${productId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       console.log(response.data);
 
       // Remove the deleted product from the state
       setProducts(products.filter((product) => product._id !== productId));
     } catch (err) {
-      console.error('Error deleting product:', err);
+      console.error("Error deleting product:", err);
       // Handle error
     }
   };
@@ -110,8 +113,8 @@ function AdminProductList() {
       category: productToEdit.category,
       price: productToEdit.price,
       description: productToEdit.description,
-      websiteLink: productToEdit.websiteLink, // Include the websiteLink field
-      imageUrls: productToEdit.imageUrls, // Set the imageUrls field correctly
+      websiteLink: productToEdit.websiteLink,
+      imageUrls: productToEdit.imageUrls,
       storeId: productToEdit.storeId,
     });
   };
@@ -133,61 +136,61 @@ function AdminProductList() {
 
   const handleSaveProduct = async () => {
     try {
-      const token = window.localStorage.getItem('token');
+      const token = window.localStorage.getItem("token");
       if (!token) {
-        console.error('Token is missing. Redirecting to login page.');
+        console.error("Token is missing. Redirecting to login page.");
         // Redirect to the login page or display an error message
         return;
       }
-  
+
       const formData = new FormData();
-      formData.append('product', editedProduct.product);
-      formData.append('storeId', editedProduct.storeId);
-      formData.append('description', editedProduct.description);
-      formData.append('category', editedProduct.category);
-      formData.append('price', editedProduct.price);
-      formData.append('websiteLink', editedProduct.websiteLink);
-  
+      formData.append("product", editedProduct.product);
+      formData.append("storeId", editedProduct.storeId);
+      formData.append("description", editedProduct.description);
+      formData.append("category", editedProduct.category);
+      formData.append("price", editedProduct.price);
+      formData.append("websiteLink", editedProduct.websiteLink);
+
       // Append the image files individually
       editedProduct.imageUrls.forEach((image) => {
-        if (typeof image === 'object') {
-          formData.append('productImages', image);
+        if (typeof image === "object") {
+          formData.append("productImages", image);
         }
       });
-  
+
       const response = await axios.put(
         `http://localhost:5432/products/${editProductId}`,
         formData,
         {
           headers: {
             Authorization: `Bearer ${token}`,
-            'Content-Type': 'multipart/form-data',
+            "Content-Type": "multipart/form-data",
           },
         }
       );
-  
+
       // Fetch the updated product data from the server
       const updatedProduct = response.data;
-  
+
       // Update the products state with the updated product data
       setProducts((prevProducts) =>
         prevProducts.map((product) =>
           product._id === editProductId ? updatedProduct : product
         )
       );
-  
+
       setEditProductId(null);
       setEditedProduct({
-        product: '',
-        category: '',
-        price: '',
-        description: '',
-        websiteLink: '',
+        product: "",
+        category: "",
+        price: "",
+        description: "",
+        websiteLink: "",
         imageUrls: [],
-        storeId: '',
+        storeId: "",
       });
     } catch (err) {
-      console.error('Error updating product:', err);
+      console.error("Error updating product:", err);
       // Handle error
     }
   };
@@ -195,13 +198,13 @@ function AdminProductList() {
   const handleCancelEdit = () => {
     setEditProductId(null);
     setEditedProduct({
-      product: '',
-      category: '',
-      price: '',
-      description: '',
-      websiteLink: '', // Reset the websiteLink field
+      product: "",
+      category: "",
+      price: "",
+      description: "",
+      websiteLink: "", // Reset the websiteLink field
       imageUrls: [], // Reset the imageUrls field
-      storeId: '',
+      storeId: "",
     });
   };
 
@@ -239,20 +242,36 @@ function AdminProductList() {
                   </thead>
                   <tbody>
                     {products
-                      .filter((product) =>
-                        typeof product.product === 'string' &&
-                        product.product.toLowerCase().includes(searchTerm.toLowerCase())
+                      .filter(
+                        (product) =>
+                          typeof product.product === "string" &&
+                          product.product
+                            .toLowerCase()
+                            .includes(searchTerm.toLowerCase())
                       )
                       .map((product) => (
                         <tr key={product._id}>
                           <td>
                             {editProductId === product._id ? (
-                              <input
-                                type="file"
-                                name="productImages"
-                                multiple
-                                onChange={handleImageChange}
-                              />
+                              <>
+                                <input
+                                  type="file"
+                                  name="productImages"
+                                  multiple
+                                  onChange={handleImageChange}
+                                />
+                                {editedProduct.imageUrls.length > 0 &&
+                                  typeof editedProduct.imageUrls[0] ===
+                                    "object" && (
+                                    <img
+                                      src={URL.createObjectURL(
+                                        editedProduct.imageUrls[0]
+                                      )}
+                                      alt="Preview"
+                                      className="product-image"
+                                    />
+                                  )}
+                              </>
                             ) : (
                               <img
                                 src={`http://localhost:5432/${product.imageUrls[0]}`}
@@ -329,14 +348,18 @@ function AdminProductList() {
                                 onChange={handleInputChange}
                               />
                             ) : (
-                              <p>{product.websiteLink || 'N/A'}</p>
+                              <p>{product.websiteLink || "N/A"}</p>
                             )}
                           </td>
                           <td>
-                          {editProductId === product._id ? (
+                            {editProductId === product._id ? (
                               <div className="buttons">
-                                <button onClick={handleSaveProduct}>Save</button>
-                                <button onClick={handleCancelEdit}>Cancel</button>
+                                <button onClick={handleSaveProduct}>
+                                  Save
+                                </button>
+                                <button onClick={handleCancelEdit}>
+                                  Cancel
+                                </button>
                               </div>
                             ) : (
                               <div className="buttons">
@@ -348,13 +371,15 @@ function AdminProductList() {
                                 </button>
                                 <button
                                   className="delete-button"
-                                  onClick={() => handleDeleteProduct(product._id)}
+                                  onClick={() =>
+                                    handleDeleteProduct(product._id)
+                                  }
                                 >
                                   <FontAwesomeIcon icon={faTrashAlt} />
                                 </button>
                               </div>
                             )}
-                             </td>
+                          </td>
                         </tr>
                       ))}
                   </tbody>
@@ -373,165 +398,3 @@ function AdminProductList() {
 }
 
 export default AdminProductList;
-// import axios from 'axios';
-// import { Link } from 'react-router-dom';
-// import './AdminProductList.css'; // Import the CSS file
-
-// function AdminProductList() {
-//   const [products, setProducts] = useState([]);
-//   const [error, setError] = useState(null);
-//   const [searchTerm, setSearchTerm] = useState('');
-//   const [isAdmin, setIsAdmin] = useState(false);
-//   const [isLoading, setIsLoading] = useState(true);
-
-//   useEffect(() => {
-//     const fetchUserData = async () => {
-//       const token = window.localStorage.getItem('token');
-//       if (token) {
-//         try {
-//           const response = await fetch('http://localhost:5432/userData', {
-//             method: 'POST',
-//             headers: {
-//               'Content-Type': 'application/json',
-//             },
-//             body: JSON.stringify({ token }),
-//           });
-
-//           const data = await response.json();
-
-//           if (
-//             data.status === 'ok' &&
-//             data.data.userType &&
-//             data.data.userType.toLowerCase() === 'admin'
-//           ) {
-//             setIsAdmin(true);
-//             fetchProducts(); // Call fetchProducts if the user is an admin
-//           } else {
-//             setIsAdmin(false);
-//             // Redirect to the login page or display an error message
-//           }
-//         } catch (error) {
-//           console.error('Error during fetch:', error);
-//           // Handle error
-//         }
-//       } else {
-//         setIsAdmin(false);
-//         // Redirect to the login page or display an error message
-//       }
-
-//       setIsLoading(false);
-//     };
-
-//     fetchUserData();
-//   }, []);
-
-//   const fetchProducts = async () => {
-//     try {
-//       const response = await axios.get('http://localhost:5432/products');
-//       setProducts(response.data);
-//     } catch (error) {
-//       setError('Failed to fetch products');
-//       console.error('Error fetching products:', error);
-//     }
-//   };
-
-//   const handleDeleteProduct = async (productId) => {
-//     try {
-//       const token = window.localStorage.getItem('token');
-//       if (!token) {
-//         console.error('Token is missing. Redirecting to login page.');
-//         // Redirect to the login page or display an error message
-//         return;
-//       }
-
-//       console.log('Deleting product with ID:', productId);
-
-//       // Make the DELETE request to the backend endpoint
-//       const response = await axios.delete(`http://localhost:5432/products/${productId}`, {
-//         headers: {
-//           Authorization: `Bearer ${token}`,
-//         },
-//       });
-
-//       console.log(response.data);
-
-//       // Remove the deleted product from the state
-//       setProducts(products.filter((product) => product._id !== productId));
-//     } catch (err) {
-//       console.error('Error deleting product:', err);
-//       // Handle error
-//     }
-//   };
-
-//   const handleEditProduct = async (productId) => {
-//     try {
-//       // Redirect to the edit product page with the productId
-//       window.location.href = `/edit-product/${productId}`;
-//     } catch (error) {
-//       console.error('Error editing product:', error);
-//       // Handle error
-//     }
-//   };
-
-//   return (
-//     <div className="templateContainer">
-//       {isLoading ? (
-//         <div>Loading...</div>
-//       ) : (
-//         <>
-//           {isAdmin ? (
-//             <>
-//               <div className="searchInput_Container">
-//                 <input
-//                   type="text"
-//                   placeholder="Search products..."
-//                   value={searchTerm}
-//                   onChange={(e) => setSearchTerm(e.target.value)}
-//                   id="searchInput"
-//                 />
-//               </div>
-//               {error && <p>{error}</p>}
-//               <div className="template_Container">
-//                 {products
-//                   .filter((product) =>
-//                     product.product.toLowerCase().includes(searchTerm.toLowerCase())
-//                   )
-//                   .map((product) => (
-//                     <div key={product._id} className="product-container">
-//                       <div className="product-image">
-//                         {product.imageUrls.map((imageUrl, index) => (
-//                           <Link key={index} to={`/products/${product._id}`}>
-//                             <img
-//                               src={`http://localhost:5432/${imageUrl}`}
-//                               alt={`Product ${index}`}
-//                               style={{ width: '100%', height: 'auto' }}
-//                             />
-//                           </Link>
-//                         ))}
-//                       </div>
-//                       <div className="product-text">
-//   <h3>{product.product}</h3>
-//   <div className="buttons">
-//     <button className="delete-button" onClick={(e) => handleDeleteProduct(product._id)}>Delete</button>
-//     {/* <button className="edit-button" onClick={(e) => handleEditProduct(product._id)}>Edit</button> */}
-//   </div>
-// </div>
-
-
-
-//                     </div>
-//                   ))}
-//               </div>
-//             </>
-//           ) : (
-//             <div>
-//               <p>You are not authorized to access this page.</p>
-//             </div>
-//           )}
-//         </>
-//       )}
-//     </div>
-//   );
-// }
-
-// export default AdminProductList;
